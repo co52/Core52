@@ -1,0 +1,102 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Models
+		</div>
+	</div>
+</div>
+
+<h2>Setup</h2>
+<p>Models in Core52 encapsulate data objects and all their related functionality, including loading from a database table, updating, and storing new objects.</p>
+<p>Store Models in your <code>app/models</code> directory.</p>
+<h3>Naming</h3>
+<ul>
+<li>Don't use weird characters in your model names. Stick with  letters,  numbers, and underscores. Don't start a model name with a  number.</li>
+<li>Model file names are case sensitive (on UNIX) and must match the model class name.</li>
+<li>Use <code>Capitalized_Snake_Case</code> for model class names.</li>
+<li>Use singular nouns for model names.</li>
+</ul>
+<h3>Pattern</h3>
+<p>At a minimum, your model classes need to extend the base <code>Model</code> class, and to set the <code>$_table</code> and <code>$_pk</code> protected properties:</p>
+<pre>&lt;?php
+
+class User extends Model {
+
+    # database table to load data from (required)
+    protected $_table = 'users';
+
+    # primary key column name (optional - default is 'id')
+    protected $_pk = 'id';
+
+    # optional database connection handle name
+    protected $_database = 'default';
+
+}
+</pre>
+<h2>Manipulating Core52 Models</h2>
+<h3>Creating</h3>
+<p>The <code>Model::create()</code> static method takes a class name and an associative array. This translates to an SQL <code>INSERT</code> query, and returns the resulting object:</p>
+<pre># returns a User object
+$obj = Model::create('User', array(
+    'name' =&gt; 'Bob',
+    'age'  =&gt; 25,
+));
+</pre>
+<p>If you need to provide a custom SQL query for loading your model object data, put the query in your class definition and use <code>_ID_</code> as the placeholder for the primary key value:</p>
+<pre>class User extends Model {
+    protected $_table = 'users';
+    protected $_pk = 'userId';
+    protected custom_query = 'SELECT * FROM users WHERE type = "member" AND userId = _ID_';
+}
+</pre>
+<h3>Loading</h3>
+<p>To load a previously saved object, simply pass the ID of the database record you want to load to your model class constructor (this translates to an SQL <code>SELECT</code> query):</p>
+<pre>$obj = new User(3);
+</pre>
+<p>Note that Core52 caches the queries used to load models, so repeated loads of the same object will not cause excessive database queries to occur.</p>
+<p>Alternately, if you have an array of data used in the Model, simply pass it to the constructor and it will skip the database query:</p>
+<pre>$user_data = array(
+    'id' =&gt; 10,
+    'name' =&gt; 'Bob',
+    'age' =&gt; 29,
+);
+$obj = new User($user_data);</pre>
+<p>To test if the object loaded successfully, use the <code>exists()</code> method:</p>
+<pre>if($obj-&gt;exists()) {
+    echo $obj-&gt;name.' is here!';
+} else {
+    echo 'User not found';
+}
+</pre>
+<h3>Updating</h3>
+<p>To update a model object, use the save() method. This will translate into either an SQL <code>INSERT</code> or an SQL <code>UPDATE</code> query, based on whether or not the primary key is present:</p>
+<pre># returns TRUE or FALSE if the update succeeds or fails
+$obj-&gt;save('name', 'Robert');  // field name, value
+
+# you can also pass an associative array and save multiple fields at once:
+$obj-&gt;save(array(
+    'name' =&gt; 'Robert',
+    'age'  =&gt; 27,
+));
+</pre>
+<p>Note that the <code>save()</code> method automatically filters out fields that are not in the table schema associated with your model class.</p>
+<h3>Deleting</h3>
+<p>To delete a model object, use the <code>delete()</code> method. This will translate into an SQL <code>DELETE</code> and unsets the object variable:</p>
+<pre>$obj-&gt;delete();
+</pre>
+<h2>Built-in Functionality</h2>
+<p>The Core52 <code>Model</code> base class provides several pieces of  built-in functionality for your convenience. See the Model documentation for details. Here is a list of some of the functionality  that is provided:</p>
+<ul>
+<li>Auto-loading sub-objects</li>
+<li>Deep-cloning model objects</li>
+<li>Bypass the query cache when reloading objects</li>
+<li>Stringification</li>
+<li>Introspection</li>
+</ul>

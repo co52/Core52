@@ -1,0 +1,136 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span> 
+			Web Services
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Web Services</h1>
+
+<p>Consuming (and feeding) web services is often an integral part of today's web apps. Core52 comes with several Objects that are designed to make life easier when integrating with web services (and since they are already integrated with Core52, you don't have to!).</p>
+<h2>CURL</h2>
+<p><strong>Depends on: </strong><a href="http://us.php.net/curl" target="_blank">PHP <code>curl</code> extension</a></p>
+<p>Takes the mess out of fetching web pages or submitting POST data. Just call either of the following:</p>
+<pre>CURL::get($url, array $data, array $params)
+CURL::post($url, array $data, array $params)</pre>
+<p>Parameters:</p>
+<ul>
+<li><code>$url</code> &#8211; URL to call</li>
+<li><code>$data</code> &#8211; associative array of GET or POST data</li>
+<li><code>$params</code> &#8211; associative array of <a href="http://us.php.net/manual/en/function.curl-setopt.php" target="_blank"><code>CURLOPT_*</code> options</a></li>
+</ul>
+<p>Returns: response string</p>
+<h2>Soap</h2>
+<p><strong>Depends on:</strong> <a href="http://us.php.net/soap" target="_blank">PHP <code>soap</code> extension</a></p>
+<p>Streamlines web service calls via SOAP. Usage example:</p>
+<pre>$xml = Soap::call($method, array $data, $wsdl);
+</pre>
+<p>Parameters:</p>
+<ul>
+<li><code>$method</code> &#8211; web service method to call</li>
+<li><code>$data</code> &#8211; associative array of data to submit (optional)</li>
+<li><code>$wsdl</code> &#8211; URL to the web service's <a href="http://www.w3.org/TR/wsdl" target="_blank">WSDL file</a></li>
+</ul>
+<p>Returns: response string, usually in XML format</p>
+<h2>Consuming RSS<strong> </strong></h2>
+<p><strong>Third-party library (<a href="http://simplepie.org" target="_blank">SimplePie</a>)</strong></p>
+<p>Consuming all types of RSS feeds couldn't be easier with SimplePie. To get a <code>SimplePie</code> object, just call:</p>
+<pre>$reader = Feedreader::factory(); // you can optionally pass a feed URL
+</pre>
+<p>Easy as pie, of course! Note that the <code>SimplePie</code> object will have caching turned on and the cache directory preconfigured by default.</p>
+<p>Be sure to <a href="http://simplepie.org/wiki/" target="_blank">read the documentation</a>.</p>
+<p>Returns: <code>SimplePie</code> object</p>
+<h2>Twitter</h2>
+<p><strong>Extends jmathai's <a href="http://github.com/jmathai/twitter-async" target="_blank"><code>twitter-async</code></a></strong></p>
+<p>This well-written PHP library simplifies consuming the Twitter REST API and OAuth.</p>
+<p>Be sure to read the <a href="http://wiki.github.com/jmathai/twitter-async/" target="_blank">official documentation on GitHub</a>.</p>
+<h3>Initialize</h3>
+<p>Add this to your authorization file:</p>
+<pre>Twitter::Initialize(array(
+    'consumerKey' =&gt; $key,
+    'consumerSecret' =&gt; $secret,
+));
+</pre>
+<h3>Doing the OAuth Jig</h3>
+<ol>
+<li>Redirect to Twitter's OAuth page:
+<pre>Path::redirect(Twitter::factory()-&gt;getAuthenticateUrl());</pre>
+</li>
+<li>Fetch the access token and secret:
+<pre>$api = Twitter::factory(NULL, FALSE, FALSE);
+$api-&gt;setToken($_GET['oauth_token']);
+$token = $api-&gt;getAccessToken();
+$credentials = new TwitterCredentialsOAuth($token-&gt;screen_name, $token-&gt;oauth_token, $token-&gt;oauth_token_secret);
+</pre>
+</li>
+<li>Get a <code>TwitterApi</code> instance (extends <code>EpiTwitter</code>):
+<pre># make $setInstance TRUE for the default instance, call Twitter::factory() to get the default instance
+$api = Twitter::factory($credentials, $setInstance, FALSE);
+</pre>
+</li>
+</ol>
+<h3>Storing Credentials Safely</h3>
+<p>To store the credentials (such as in a database), encrypt them:</p>
+<pre>$encrypted = $credentials-&gt;encrypt();  // serializes object, encrypts, and base64 encodes
+$decrypted = TwitterCredentials::decrypt($encrypted);  // returns deserialized object
+</pre>
+<p>Note that you will not be able to decrypt if you change your Twitter API consumer key, since it is used in the encryption key.</p>
+<h3>Calling the API</h3>
+<p>Use <code>get()</code> and <code>post()</code> to call Twitter's REST API:</p>
+<pre># get user profile
+$profile = $api-&gt;get('/account/verify_credentials.json');
+
+# send a tweet
+$tweet_sent = $api-&gt;post('/statuses/update.json', array('status' =&gt; $tweet));
+</pre>
+<h3>Exceptions</h3>
+<ul>
+<li><code>TwitterCredentialsException</code> &#8211; probably a decryption error</li>
+<li><code>EpiTwitterException</code></li>
+<li><code>EpiTwitterBadRequestException</code></li>
+<li><code>EpiTwitterNotAuthorizedException</code></li>
+<li><code>EpiTwitterForbiddenException</code></li>
+<li><code>EpiTwitterNotFoundException</code></li>
+</ul>
+<h2>Facebook</h2>
+<p><strong>Third-party library (Official Facebook PHP library)</strong></p>
+<p><em>Pending core updates for the new Facebook PHP API library</em><strong><br />
+</strong></p>
+<h2>YouTube</h2>
+<p><strong>Depends on:</strong> <code>CURL</code> Object</p>
+<p>Scrape <a href="http://youtube.com" target="_blank">YouTube.com</a> for the title and description of a video, given the URL. Or, embed a YouTube video in a page.</p>
+<pre># fetch title, description
+$video = new Youtube($url);
+$video-&gt;fetch();
+echo "$video-&gt;title - $video-&gt;description";
+
+# embed
+echo $video-&gt;embed($width, $height); // default dimensions are 200x130 px
+</pre>
+<h2>Bit.ly</h2>
+<p><strong>Depends on:</strong> <code>CURL</code> Object</p>
+<p>Shorten links using the <a href="http://bit.ly">Bit.ly</a> <a href="http://bit.ly/apidocs" target="_blank">API</a>.</p>
+<p>Initialize the <code>Bitly</code> object in your authorization file:</p>
+<pre>Bitly::Initialize($username, $api_key);
+// this also works:
+Bitly::Initialize(array(
+    'login' =&gt; $username,
+    'api_key' =&gt; $api_key,
+));
+</pre>
+<p>Then you can shorten a link:</p>
+<pre>$short_url = Bitly::shorten($url);
+</pre>
+<p>Exceptions you might encounter:</p>
+<ul>
+<li><code>BitlyException</code> &#8211; General exception.</li>
+<li><code>BitlyRateLimitException</code> &#8211; Too many requests. Either wait a while or upgrade your account.</li>
+<li><code>BitlyInvalidRequestException</code> &#8211; Invalid parameters. Check your login and API key.</li>
+<li><code>BitlyUnavailableException</code> &#8211; API down.</li>
+</ul>

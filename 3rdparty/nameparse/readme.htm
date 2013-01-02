@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head profile="http://dublincore.org/documents/dcq-html/ http://alphahelical.com/foaf/author">
+<script src="/clip.js" type="text/javascript"></script>
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+
+<!-- Begin Authorship and Copyright Information -->
+<link rel="schema.dc" href="http://purl.org/dc/elements/1.1/" />
+<link rel="schema.dcterms" href="http://purl.org/dc/terms/" />
+<meta name="dc.copyright" content="Copyright 2005 Keith Beckman" />
+<link rel="meta" type="application/rdf+xml" title="FOAF" href="http://alphahelical.com/foaf/foaf.rdf" />
+<link rel="author" href="http://alphahelical.com/foaf" title="Author" />
+<link rev="made" href="http://alphahelical.com/foaf" title="Author" />
+<meta name="dc.creator author" scheme="dcterms.uri" content="http://alphahelical.com/foaf" />
+<meta name="FOAF:sha1sum_mbox" content="fdf33463d7acf1a2a3c4221156b5b4ce5c2d52a5" />
+<!--  End Authorship and Copyright Information  -->
+
+<!-- OpenID -->
+	<link rel="openid.server" href="http://ishmael.infiniteplane.com/" />
+	<link rel="openid.delegate" href="http://ishmael.infiniteplane.com/" />
+	<link rel="pavatar" href="http://ishmael.infiniteplane.com/pavatar.png" />
+<!-- End OpenID -->
+
+
+<link rel="stylesheet" type="text/css" href="/code/code.css" />
+
+<title>
+</title>
+
+<script type="text/javascript" src="http://sehrgut.co.uk/scripts/scalohan.php"></script>
+
+</head>
+
+<body class="main">
+
+	<div class="container">
+
+		<div class="header">
+		<h2>Helical Alpha Code</h2>
+		</div>
+
+			<div class="sidebar">
+				
+<h3>[ site ]</h3>
+
+<ul>
+<li><big>+</big> <a href="http://alphahelical.com" title="alpha home">alpha home</a></li>
+<li><big>+</big> <a href="/code" title="code home">code home</a></li>
+<li><big>+</big> <a href="http://alphahelical.com/contact.php" title="contact form">contact form</a></li>
+</ul>
+
+<h3>[ content management ]</h3>
+
+<ul>
+<li><big>+</big> <a href="/code/cms/blas" title="BLAserve">BLAserve</a></li>
+<li><big>+</big> <a href="/code/cms/contify" title="contify: scaffold">contify: scaffold</a></li>
+<li><big>+</big> <a href="/code/cms/templex" title="templex engine">templex engine</a></li>
+</ul>
+
+<h3>[ mac os x ]</h3>
+
+<ul>
+<li><big>+</big> <a href="/code/osx/airkext" title="airkext: wifi kext manager">airkext: wifi kext manager</a></li>
+<li><big>+</big> <a href="/code/osx/airpoll" title="airpoll: airport status">airpoll: airport status</a></li>
+<li><big>+</big> <a href="/code/osx/dashtoggle" title="dashtoggle: kill the dash!">dashtoggle: kill the dash!</a></li>
+<li><big>+</big> <a href="/code/osx/fpath" title="fpath: cd into finder">fpath: cd into finder</a></li>
+<li><big>+</big> <a href="/code/osx/hidetoggle" title="hidetoggle: see dotfiles">hidetoggle: see dotfiles</a></li>
+<li><big>+</big> <a href="/code/osx/trash" title="trash: trash from the terminal">trash: trash from the terminal</a></li>
+</ul>
+
+<h3>[ sci/math ]</h3>
+
+<ul>
+<li><big>+</big> <a href="/code/sci/kmeans" title="kmeans cluster">kmeans cluster</a></li>
+<li><big>+</big> <a href="/code/crypto/saf" title="secure arcfour">secure arcfour</a></li>
+</ul>
+
+<h3>[ shell scripts ]</h3>
+
+<ul>
+<li><big>+</big> <a href="/code/scripts/comicget" title="comicget: comics.com client">comicget: comics.com client</a></li>
+<li><big>+</big> <a href="/code/scripts/gcci" title="gcci: c script interpreter">gcci: c script interpreter</a></li>
+<li><big>+</big> <a href="/code/scripts/rot" title="rot: sub cyphers">rot: sub cyphers</a></li>
+<li><big>+</big> <a href="/code/scripts/turl" title="turl: tinyurl client">turl: tinyurl client</a></li>
+</ul>
+
+<h3>[ miscellany ]</h3>
+
+<ul>
+<li><big>+</big> <a href="/code/misc/clip" title="clip clipboard grabber">clip clipboard grabber</a></li>
+<li><big>+</big> <a href="/code/misc/cont" title="cont form mailer">cont form mailer</a></li>
+<li><big>+</big> <a href="/code/misc/dyndate" title="dyndate date changer">dyndate date changer</a></li>
+<li><big>+</big> <a href="/code/misc/ginclude" title="GINC tool">GINC tool</a></li>
+<li><big>+</big> <a href="/code/misc/nameparse" title="nameparse php name parser">nameparse php name parser</a></li>
+<li><big>+</big> <a href="/code/misc/pngpix" title="pngpix: dynamic pixels">pngpix: dynamic pixels</a></li>
+</ul>
+			</div>
+			
+			<div class="body">
+
+<h2>nameparse: PHP name parser</h2><p>Once upon a time (03Mar2007), I wanted to write a library card catalogue.
+However, my author-parsing routine was leaving something to be desired. It
+required names to be input in a very rigid form, which I wasn't sure I wanted
+to do late at night (or after several hours of cataloguing new accessions).
+Well, "Free and Open Source Software", right? Wrong. There is a huge market
+for name parsing, apparently, since there are dozens of commercial products
+claiming to make sense of any name format extant.</p>
+
+<p>I eventually found one, and written in PHP, no less!
+<code>normalize_name</code>, written by Jed Hartman, is along the lines of what
+I was looking for
+(<a href="http://www.kith.org/journals/jed/2007/02/11/3813.html"
+	title="Lorem Ipsum: Name Parser, by Jed Hartman">announcement</a>,
+<a href="http://www.kith.org/logos/things/code/name-parser-php.html"
+	title="source code of normalize_name, name normalization function in PHP, by Jed Hartman">source</a>).
+Unfortunately, it is somewhat limited for my purposes. It normalizes names to
+first and last name, discarding titles, not differentiating between first and
+middle names, and requiring names to be in "spoken" format (first followed by
+last). However, he had some ideas which I incorporated into <code>nameparse.php</code>, especially in the recognition of prefixes
+(prefices?), suffixes (suffices?), and multi-word last names.</p>
+
+<p><code>nameparse.php</code> can recognize names in
+"[title]first[middles]last[,][suffix]" and "last,first[middles][,][suffix]"
+forms, which, when you think about it, cover most if not all well-formed name
+input formats. <code>nameparse.php</code> handles last names of arbitrary
+complexity, such as "bin Laden", "van der Vort", and "Garcia y Vega", as well as
+middle names of arbitrary size and complexity, differentiating between most last
+names and the first or middle names or initials preceding them.</p>
+
+<p>An example of names correctly parse by nameparse.php:</p>
+<ul>
+<li>Doe, John. A. Kenneth III</li>
+<li>Velasquez y Garcia, Dr. Juan, Jr.</li>
+<li>Dr. Juan Q. Xavier de la Vega, Jr.</li>
+</ul>
+
+<p>To use, simple <code>include()</code> or <code>require()</code>
+<code>nameparse.php</code> and call <code>parse_name($string)</code> on any
+name. <code>parse_name()</code> returns an associative array of all name
+segments found of "title","first","middle","last", and "suffix". Do note
+that no spelling, capitalization, or punctuation of titles, prefixes, or
+suffixes is normalized. That is, every token remains as entered:
+<code>nameparse.php</code> is a semantic parser only. If you want orthographic
+or other normalization, you'll have to postprocess the output. However,
+since the name is now semantically parsed, such postprocessing is (for
+applications which require it) simple.</p>
+
+<p>
+<code>
+	print_r(parse_name('Velasquez y Garcia, Dr. Juan Q. Xavier III'));
+</code>
+<br /><br />yields . . .
+<pre>
+Array
+(
+    [title] => Dr.
+    [first] => Juan
+    [middle] => Q. Xavier
+    [suffix] => III
+    [last] => Velasquez y Garcia
+)
+</pre>
+</p>
+
+<p>There you have it. The first drop-in Free and Open Source name parser
+in PHP. Now to rewrite it in C&nbsp;.&nbsp;.&nbsp;.</p>
+
+<p>If you want test vectors and a test harness, they're available in the
+"package" section.</p>
+<p class="project-nav">nameparse | <a href="/code/misc/nameparse/src">Download Source</a> | <a href="/code/misc/nameparse/pkg">Download Package</a>
+<script type="text/javascript" src="http://sehrgut.co.uk/scripts/scalohan.php?guid=alpha_code_nameparse&amp;title=nameparse&amp;disp=link"></script></p>
+			</div>
+
+
+		<div class="footer">
+		<h4>alphahelical<br /><br />copyright <a href="/contact.php" title="contact keith beckman">keith beckman</a></h4>
+		</div>
+
+	</div>
+
+</body>
+</html>

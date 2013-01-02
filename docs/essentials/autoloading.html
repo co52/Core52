@@ -1,0 +1,41 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Autoloading
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Autoloading</h1>
+
+<p>Core52 provides completely automatic loading of Models and Libraries provided that the file name matches the class name. Note that file names are case sensitive on UNIX-type operating systems.</p>
+<h2>Autoload Sequence</h2>
+<p>When a new class is referenced, Core52&#8242;s autoloader looks for a matching file in the following directories, in order:</p>
+<ol>
+<li><code>app/models</code></li>
+<li><code>app/objects</code></li>
+<li><code>core/objects</code></li>
+</ol>
+<p>Note that this allows for core objects to be overridden (versus extended) by simply putting the replacement in the <code>app/objects</code> directory.</p>
+<p>Core52&#8242;s autoloader is built around the PHP <code>spl_autoload_register()</code> function, thereby allowing multiple cascading autoloaders to be registered. Thus, if the Core52 autoloader fails and multiple loaders are registered on the autoload stack, then Core52 will return <code>FALSE</code> to allow the next loader to take over.</p>
+<h2>Disabling Autoloading</h2>
+<p>To disable, simply call:</p>
+<pre>AutoClassLoader::Unregister();
+</pre>
+<p>To re-enable:</p>
+<pre>AutoClassLoader::Register();
+</pre>
+<h2>Error Handling</h2>
+<p>If a class cannot be loaded, then an <code>AutoClassLoaderException</code> will be thrown. To disable this behavior, call:</p>
+<pre>AutoClassLoader::ThrowExceptions(FALSE);
+</pre>
+<p>To enable:</p>
+<pre>AutoClassLoader::ThrowExceptions(TRUE);
+</pre>

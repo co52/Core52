@@ -1,0 +1,7 @@
+php_flag magic_quotes_gpc Off
+
+RewriteEngine on
+RewriteCond $1 !^(_initialize\.php|static|favicon\.ico)
+RewriteRule ^(.*)$ /_initialize.php/$1 [L]
+
+Options +FollowSymlinks -MultiViews

@@ -1,0 +1,37 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Objects
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Objects</h1>
+
+<h2>Usage</h2>
+<p>Perhaps confusingly named, Core52 Objects are essentially libraries that can encapsulate just about any functionality needed. Objects are ideal for functionality that is shared throughout your application.</p>
+<p>Store Objects in your <code>app/objects</code> directory.</p>
+<h3>Naming</h3>
+<ul>
+<li>Don't use weird characters in your model names. Stick with  letters,   numbers, and underscores. Don't start a model name with a  number.</li>
+<li>Object file names are case sensitive (on UNIX) and must match the Object class name.</li>
+</ul>
+<h3>Pattern</h3>
+<pre>&lt;?php
+
+class Import {
+
+}
+</pre>
+<p>There is no base Object class, and you have full, free reign designing your Objects. You can also drop in third-party classes here&#8211;just make sure the naming rules above are followed so that autoloading doesn&#8217;t break.</p>
+<p>It is possible to include multiple classes in one object file, however if these classes are used outside of your primary Object class then you will need to manually include() the object before referencing any of those classes. It is generally best to limit objects to one class per file.</p>
+<h2>Core Objects</h2>
+<p>Core52 provides numerous objects in the <code>core/objects</code> directory. To learn about the functionality that is available, see the Core52 Libraries section of the documentation.</p>
+<p>Note that if  an app Object is the same name as a Core52 Object, the app Object will  override the Core52 Object. See &#8220;Overriding Core52&#8243; in the Hacking  section.</p>

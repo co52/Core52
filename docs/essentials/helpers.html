@@ -1,0 +1,37 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Helpers
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Helpers</h1>
+
+<h2>Usage</h2>
+<p>Helpers are collections of related functions that do specific tasks, like formatting, filtering, etc.</p>
+<p>Store Helpers in your <code>app/helpers</code> directory.</p>
+<h3>Loading</h3>
+<p>Helpers must be loaded manually. You can load helpers using the <code>core_load_helper()</code> function:</p>
+<pre>core_load_helper('my_helper_name');  // leave off the .php
+core_load_helper('format', TRUE);  // load a core helper
+</pre>
+<h2>Core Helpers</h2>
+<p>Core52 includes an array of useful helpers that you can use in your application:</p>
+<ul>
+<li>Composing raw or bulk email messages</li>
+<li>Rendering HTML form fields (borrowed from <a href="http://codeigniter.com" target="_blank">CodeIgniter</a>)</li>
+<li>Filtering and sanitizing input</li>
+<li>Formatting JSON objects</li>
+<li>Deep-cloning objects</li>
+<li>Formatting dates and times</li>
+<li>Inflecting words</li>
+</ul>
+<p>See the Core52 Helpers section in the documentation for more details.</p>

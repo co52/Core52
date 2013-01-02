@@ -1,0 +1,80 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="database-access" title="Database Access">Database Access</a>
+			<span class="sep">/</span>
+			Building Queries
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Building Queries</h1>
+<p>The DatabaseQuery class allows you to build queries programmatically  with ease. This class was inspired partly by CodeIgniter&#8217;s Active Record  functionality.</p>
+<h2>Factory</h2>
+<p>To get a <code>DatabaseQuery</code> instance, call the <code>start_query()</code> method on your database connection:</p>
+<pre>$q = database()-&gt;start_query('table_name', 'statement');
+</pre>
+<p><code>statement</code> should be a MySQL query keyword: <code>SELECT</code> (default), <code>SELECT DISTINCT</code>, <code>UPDATE</code>, <code>DELETE</code>,  <code>INSERT</code>, or <code>REPLACE</code>.</p>
+<h2>Methods</h2>
+<h3>select('column1', 'column2', ...)</h3>
+<p>Forms a <code>SELECT</code> clause. Can accept a variable number of  column names, or an array of column names.</p>
+<pre>$q-&gt;select('name', 'age');
+</pre>
+<h3>where()</h3>
+<p>Forms a <code>WHERE</code> clause. Can accept a column name and  value, or an associative array of multiple column names and values:</p>
+<pre>$q-&gt;where('name', 'Bob');
+$q-&gt;where($conditions);  // this also works
+</pre>
+<p>By default, this method checks for equality. If you need a different  operator, append that to the column name:</p>
+<pre>$q-&gt;where('visits &gt;', 3);
+</pre>
+<h3>where_in()</h3>
+<p>Forms a <code>WHERE IN(...)</code> clause. You must pass a column  name, and an array of values to compare against:</p>
+<pre>$q-&gt;where_in('name', array('Bob', 'David', 'Jill'));
+</pre>
+<h3>raw_where()</h3>
+<p>Allows complex conditions in the <code>WHERE</code> clause:</p>
+<pre>$q-&gt;raw_where('(timestamp &gt; UNIX_TIMESTAMP() OR timestamp IS NULL)');</pre>
+<p><strong>Use  with caution. Do not pass in data from variables that have not been  escaped or you will be vulnerable to SQL injection.</strong></p>
+<h3>group_by()</h3>
+<p>Forms a <code>GROUP BY</code> clause. Like <code>select()</code>, it  accepts either column names or an array:</p>
+<pre>$q-&gt;group_by('age', 'height');</pre>
+<h3>order_by()</h3>
+<p>Forms an <code>ORDER BY</code> clause. Like <code>select()</code>, it  accepts either column names or an array:</p>
+<pre>$q-&gt;order_by('timestamp', 'id');
+</pre>
+<p>If needed you can append an order keyword to the column name:</p>
+<pre>$q-&gt;order_by('timestamp DESC', 'id ASC');</pre>
+<h3>limit()</h3>
+<p>Forms a <code>LIMIT</code> clause. Pass numeric arguments for <code>limit</code> and <code>offset</code>:</p>
+<pre>$q-&gt;limit(100, 300); // get 100 results, starting with record # 300</pre>
+<h3>first()</h3>
+<p>Same as limit(1)</p>
+<h3>join()</h3>
+<p>Forms a <code>JOIN</code> clause. Pass the table name, join  conditions, and a boolean indicating whether or not to do a <code>LEFT  JOIN</code>.</p>
+<pre># LEFT JOIN employees ON employees.id = users.id
+$q-&gt;join('employees', 'employees.id = users.id', TRUE);</pre>
+<h3>union()</h3>
+<p>Adds a second query as a <code>UNION</code>. Pass a query string and a  boolean indicating whether or not to return only unique results, or all  the results:</p>
+<pre>$q-&gt;union($query, FALSE);  // ... UNION ALL [query]</pre>
+<h3>set()</h3>
+<p>Adds a <code>SET</code> clause for <code>INSERT</code>, <code>UPDATE</code>,  or <code>REPLACE</code> queries. Like <code>where()</code>, it accepts a  pair of arguments (column, value) or an associative array:</p>
+<pre>$q-&gt;set('name', 'Bob');
+$q-&gt;set($data); // this also works
+</pre>
+<h2>Method Chaining</h2>
+<p>The methods outlined above return the current instance, so you can chain together methods conveniently:</p>
+<pre>$q-&gt;select(...)-&gt;where(...)-&gt;order_by(...);
+</pre>
+<h2>Execution</h2>
+<p>Once you&#8217;re done setting up your DatabaseQuery object, just call the run() method:</p>
+<pre>$result = $q-&gt;run();
+</pre>
+<p>Alternately, you can cast the query object as a string to get the SQL query:</p>
+<pre>$result = database()-&gt;execute((string) $q);
+</pre>

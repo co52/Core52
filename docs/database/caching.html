@@ -1,0 +1,25 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="database-access" title="Database Access">Database Access</a>
+			<span class="sep">/</span>
+			Caching
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Caching</h1>
+
+<p>Caching is controlled on a per-query basis and is disabled by default. To enable caching, pass <code>TRUE</code> as the second argument the <code>execute()</code> method on your <code>DatabaseConnection</code> instance:</p>
+<pre>$result_cached = database()-&gt;execute($query, TRUE);
+$result_cached = Database::e($query, TRUE); // this also works</pre>
+<p>If you&#8217;re running using a DatabaseQuery:</p>
+<pre>$result_cached = $query-&gt;run(TRUE);</pre>
+<p>Note that contrary to the <code>execute()</code> method, <code>run()</code> enables caching by default.</p>
+<p>If you&#8217;re running using Database modifiers, you can use <code>Database::cache($setting)</code> to enable/disable caching.</p>
+<p>Caching is provided by the <code>DatabaseCache</code> class. For more details, see the Database page in &#8220;Core52 Libraries&#8221;.</p>

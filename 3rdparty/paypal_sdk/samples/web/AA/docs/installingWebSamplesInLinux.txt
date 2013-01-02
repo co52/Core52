@@ -1,0 +1,27 @@
+The following instructions guide you through to install web samples on clean environment.
+
+Web samples Quick installation steps 
+1) Install OpenSSL package for your linux distribution.
+2) Install Apache HTTP Server version 2.x.
+3) Install lbrary called LibCurl with SSL enabled.
+4) Install library called LibXML.
+5) Install PHP 5.2.x(with curl and openssl support) and configure with Apache HTTP Server.
+	Install PEAR Package Manager.
+6) Install web samples (php_sdk\samples\web) into htdocs directory.
+   6.1)Grant Write Access to Log file defined in the paypal_sdk_clientproperties.php
+    	
+Web Samples Detailed installation steps
+1) OpenSSL
+	Download the linux source of OpenSSL(http://www.openssl.org/source) or respective OpenSSL Package from Repositories of your Linux distro and install it.
+2) Apache Web Server
+	Download the linux source of Apache HTTP Server 2.x version from http://httpd.apache.org/download.cgi and install it.
+3) LibCurl
+	Download LibCurl from http://curl.haxx.se/download or respective Package from Repositories of your Linux distro and install with SSL enabled.
+4) LibXML
+	Download LibXML from ftp://fr.rpmfind.net/pub/libxml or respective Package from Repositories of your Linux distro and install it. 
+5) Install PHP
+	Download and Install PHP 5.2.x version from php.net. And enable curl and openssl extensions while installation.
+6) Deployment of Web Sample
+	Copy the web folder from (php_sdk\samples\web) to Apache htdocs folder and browse the web sample using (http://localhost/web) if Apache is running at port 80.
+	6.1)Write Access to Log file
+		Please grant write Access to the Log file(logs/paypal_platform.log) defined in paypal_sdk_clientproperties.php using 'chmod' command in terminal window.

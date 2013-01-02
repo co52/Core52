@@ -1,0 +1,142 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="database-access" title="Database Access">Database Access</a>
+			<span class="sep">/</span>
+			Fetching Query Results
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Fetching Query Results</h1>
+
+<p>Running a database query in Core52 will return a <code>DatabaseResult</code> object, which encapsulates the query results and several methods that can provide the results in just about any format you&#8217;ll ever need.</p>
+<h2>Query Success</h2>
+<p>After running a query, you&#8217;ll want to see whether your query ran successfully.</p>
+<h3>Did it find data? (SELECT queries)</h3>
+<pre>$result = $query-&gt;run();
+if($result-&gt;null_set()) {
+    # no data ...
+}
+</pre>
+<h3>Did it affect rows? (UPDATE, REPLACE, or DELETE queries)</h3>
+<pre>$result = $query-&gt;run();
+echo $result-&gt;affected_rows().' rows updated';</pre>
+<h3>What&#8217;s my ID? (INSERT queries)</h3>
+<pre>$result = $query-&gt;run();
+$id = $result-&gt;insert_id();</pre>
+<h2>Fetching Query Rows</h2>
+<h3>Rows as Objects</h3>
+<p>To return all rows, use the <code>result()</code> method:</p>
+<pre>$result = database()-&gt;execute('SELECT name, age FROM users');
+print_r($result-&gt;result());
+</pre>
+<p>Outputs looks like this:</p>
+<pre>array(
+    StdObject(
+        name =&gt; Max
+        age  =&gt; 34
+    ),
+    StdObject(
+        name =&gt; John
+        age  =&gt; 41
+    ),
+    ...
+)
+</pre>
+<p>If you only need a single row, use the <code>row()</code> method:</p>
+<pre>$result = database()-&gt;execute('SELECT name, age FROM users');
+$person = $result-&gt;row();
+echo 'Person name: '.$person-&gt;name;
+</pre>
+<h3>Rows as Arrays</h3>
+<p>To return all rows in array format, use the <code>result_array()</code> method:</p>
+<pre>$result = database()-&gt;execute('SELECT name, age FROM users');
+print_r($result-&gt;result_array());
+</pre>
+<p>Outputs looks like this:</p>
+<pre>array(
+    array(
+        name =&gt; Max
+        age  =&gt; 34
+    ),
+    array(
+        name =&gt; John
+        age  =&gt; 41
+    ),
+    ...
+)
+</pre>
+<p>If you only need a single row, use the <code>row_array()</code> method:</p>
+<pre>$result = database()-&gt;execute('SELECT name, age FROM users');
+$person = $result-&gt;row_array();
+echo 'Person name: '.$person['name'];
+</pre>
+<h3>Rows as Models</h3>
+<p>If you need to load a lot of Model objects from the database, you might automatically select a bunch of IDs and create your objects:</p>
+<pre>$result = database()-&gt;execute('SELECT id FROM users');
+$models = array();
+foreach($result-&gt;result() as $row) {
+    $models[] = new User($row-&gt;id);  // bad - this runs one additional query for each ID found
+}</pre>
+<p>A much more efficient way is to select all the data the models normally require, and to use the <code>objects()</code> method:</p>
+<pre>$result = database()-&gt;execute('SELECT id FROM users');
+$models = $result-&gt;objects('User');</pre>
+<p>Not only does this involve much less code, but Models don&#8217;t run the query on construct if they are passed an array of data. The above code essentially does the same as this:</p>
+<pre>$result = database()-&gt;execute('SELECT id FROM users');
+$models = array();
+foreach($result-&gt;result_array() as $row) {
+    $models[] = new User($row);  // good - does not run queries for each User instance
+}
+</pre>
+<p>If you only need one, use the <code>object()</code> method:</p>
+<pre>$result = database()-&gt;execute('SELECT id FROM users');
+$user = $result-&gt;object('User');</pre>
+<h3>Filtering Query Results</h3>
+<p>The <code>filter()</code> method allows you to pass a PHP expression (in <code>string</code> format) and returns an array of all the matching rows (in <code>object</code> format):</p>
+<pre># {row} is a placeholder for the row
+$bobs = $result-&gt;filter('{row}-&gt;name == "Bob"'); // returns all rows where name == 'Bob'
+</pre>
+<p>Be careful&#8211;using <code>filter()</code> on large datasets will yield poor performance.</p>
+<h3>Column Values</h3>
+<p>If you need to extract all the values of a single column as an array, use the <code>values()</code> method:</p>
+<pre>$names = $result-&gt;values('name');       // gets all the name values
+$names = $result-&gt;values('name', TRUE); // gets all the unique name values
+</pre>
+<p>Filtering is also supported:</p>
+<pre>$seniors = $result-&gt;values('age', FALSE, '{row}-&gt;age &gt;= 60');
+</pre>
+<h3>Aggregating Column Values</h3>
+<p>You can easily compute the sum of all the values of a column:</p>
+<pre>$age_sum = $result-&gt;sum('age');
+
+# filtering is also supported
+$sum_of_ages_over_sixty = $result-&gt;sum('age', '{row}-&gt;age &gt; 60');
+</pre>
+<p>You can also compute averages:</p>
+<pre>$average_age = $result-&gt;avg('age');
+
+# filtering is also supported
+$average_senior_age = $result-&gt;avg('age', '{row}-&gt;age &gt;= 60');</pre>
+<h3>CSV Data</h3>
+<p>Returns a string with CSV data, ideal for export as a spreadsheet:</p>
+<pre># Arguments are optional. Defaults are:
+# csv($delimiter = ',', $qualifier = '"', $linebreak = "\n", $add_column_names = TRUE);
+echo $result-&gt;csv();
+</pre>
+<h3>HTML Table</h3>
+<p>You can also export query data as a no-frills HTML table:</p>
+<pre>echo $result-&gt;table();
+</pre>
+<p>Sample table:</p>
+<pre>&lt;table&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Age&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tr&gt;&lt;td&gt;Bob&lt;/td&gt;&lt;td&gt;34&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Jack&lt;/td&gt;&lt;td&gt;41&lt;/td&gt;&lt;/tr&gt;
+  ...
+&lt;/table&gt;</pre>

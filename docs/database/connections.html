@@ -1,0 +1,75 @@
+<div class="breadcrumb">
+    <div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="database-access" title="Database Access">Database Access</a>
+			<span class="sep">/</span>
+			Connections
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Connections</h1>
+
+<p>To create a database connection, use the <code>DatabaseConnection::factory()</code> method (or the shortcut function <code>database()</code>). For  security, you should initialize all your database connections <a href="../documentation-2/essentials/setup">inside of  your  authentication file</a>.</p>
+<pre>DatabaseConnection::factory('connection-name', $parameters, $set_as_default);
+# or:
+database('connection-name', $parameters, $set_as_default);
+</pre>
+<h2>Connection Name</h2>
+<p>Provide a unique identifier for your database connection. If you use  multiple database connections then you will need this identifier to run  queries on this connection.</p>
+<h2>Connection Parameters</h2>
+<p>This needs to be an associative array with the following keys:</p>
+<ul>
+<li><code>host</code> &#8211; hostname of the database server</li>
+<li><code>user</code> &#8211; database user name</li>
+<li><code>pass</code> &#8211; database password</li>
+<li><code>db</code> &#8211; database schema name</li>
+<li><code>debug</code> &#8211; (boolean) enable query tracing</li>
+<li><code>persist</code> &#8211; (boolean) enable persistent connections via <code>mysql_pconnect()</code></li>
+</ul>
+<h2>Default Connection Flag</h2>
+<p>This boolean flag indicates whether this should be set as the default  connection.</p>
+<h2>Retrieving Connections</h2>
+<p>Now that you&#8217;ve defined a connection, you can retrieve it using the  same method:</p>
+<pre>$c = DatabaseConnection::factory('connection-name');
+# or:
+$c = database('connection-name');
+</pre>
+<p>To get the default connection, omit the connection name argument.</p>
+<h2>DatabaseConnection methods</h2>
+<h3>connect($dieOnError = TRUE)</h3>
+<p>Connects, or re-connects, with the database. Pass <code>FALSE</code> to suppress <code>DatabaseExceptions</code> on failure.</p>
+<h3>connection()</h3>
+<p>Returns the MySQL connection resource for this connection.</p>
+<h3>ping()</h3>
+<p>Returns <code>TRUE</code> if the database connection is still alive, <code>FALSE</code> if the connection has been lost.</p>
+<h3>thread_id()</h3>
+<p>Returns the MySQL connection ID via <code>mysql_thread_id()</code>.</p>
+<h3>last_query()</h3>
+<p>Returns the last query run on this connection.</p>
+<h3>get_escape_options()</h3>
+<p>Returns the current escape options bitmask. The default is <code>DatabaseConnection::ESCAPE_STRIP_HTML | DatabaseConnection::ESCAPE_QUOTE</code>.</p>
+<h3>set_escape_options($options)</h3>
+<p>Accepts a bitmasked integer. Sets the default data escape options for the connection. The available options are:</p>
+<ul>
+<li><code>DatabaseConnection::ESCAPE_FORCE</code></li>
+<li><code>DatabaseConnection::ESCAPE_QUOTE</code></li>
+<li><code>DatabaseConnection::ESCAPE_STRIP_HTML</code></li>
+</ul>
+<p>To turn on one of the settings without clearing the other settings, use a bitwise <code>OR</code>:</p>
+<pre>$connection-&gt;set_escape_options($connection-&gt;get_escape_options() | DatabaseConnection::ESCAPE_QUOTE);</pre>
+<p>To clear, use a bitwise <code>AND</code> and <code>NOT</code>:</p>
+<pre>$connection-&gt;set_escape_options($connection-&gt;get_escape_options() &amp; ~DatabaseConnection::ESCAPE_QUOTE);</pre>
+<h3>escape($value, $escape_options = NULL)</h3>
+<p>Escapes a data value. If <code>$escape_options</code> is omitted, uses the default escape options. To escape with specific settings, pass an escape settings bitmask as the second argument (see <code>set_escape_options()</code> above).</p>
+<pre>$clean = $connection-&gt;escape($dirty);
+</pre>
+<h3>execute($query)</h3>
+<p>Executes an SQL query. If a <code>DatabaseQuery</code> object is passed, automatically casts the object as a string. Returns a <code>DatabaseResult</code> object (see &#8220;Fetching Query Results&#8221;).</p>
+<pre>$result = $connection-&gt;execute("SELECT * FROM users");</pre>

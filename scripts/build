@@ -1,0 +1,83 @@
+#!/usr/bin/env php
+<?php
+
+// grab the core - meant to be run from the core/scripts directory 
+
+// Where are we?
+$directory = getcwd();
+
+// Move to where the script is 
+chdir(dirname(__FILE__));
+
+// Find the app 
+$app_present = TRUE;
+$initialize_file = false;
+
+// Allow us to introspect and work on the builder app with our own tool 
+if (in_array('-introspective', $argv)) {
+
+	$initialize_file = "$directory/controllers/_initialize.php";
+
+// Are we within an app or core folder?
+} else if (preg_match('/(.*?)\/(app|core)($|\/)/', $directory, $matches)) {
+
+	list($full, $path, $type) = $matches;
+
+	$initialize_file = "$path/app/controllers/_initialize.php";
+
+// Is there an app or core folder below us?
+} elseif (file_exists("$directory/app") || file_exists("$directory/core")) {
+
+	$initialize_file = "$directory/app/controllers/_initialize.php";
+
+} elseif (file_exists("$directory/trunk") || file_exists("$directory/qa")) {
+
+	print("\n\033[0;31mPlease move to a trunk or qa directory before building.\033[0m\n\n");
+	exit(0);
+
+} else {
+
+	// We don't have an application - that's going to limit some of the things we can do with builder, and open new option
+	$app_present = FALSE;
+
+	print("\n\033[0;31mYou don't seem to be in an app, core, or root directory of a project (e.g. /project/app/ or /project/)\033[0m\n\n");
+	print("Create a new project using\n");
+	print("  build project_name project\n\n");
+
+	// Fetch our own core 
+	$initialize_file = '../initialize.php';
+
+}
+
+
+// Confirm the file exists, so you won't accidentally run in just any directory with /app/
+if (!file_exists($initialize_file)) {
+
+	// We can also check for an index file 
+	$initialize_file = str_replace('_initialize.php', 'index.php', $initialize_file);
+	
+	if (!file_exists($initialize_file)) {
+
+		print("\n\033[0;31mWe can't find an initialize file ($initialize_file), please add one.\033[0m\n\n");
+		exit(0);
+	}
+}
+
+// Now move to the initialize directory 
+if ($app_present) { 
+	chdir(dirname($initialize_file));
+}
+
+// Initialize the core and possibly app
+require($initialize_file);
+
+// restore the default error and exception handlers for non-HTML output
+restore_error_handler();
+restore_exception_handler();
+
+// Run builder
+$builder = new Builder();
+$success = $builder->run($argv, $app_present, $directory);
+
+exit((int) !$success);
+

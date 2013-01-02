@@ -1,0 +1,158 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Views
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Views</h1>
+
+<h2>Usage</h2>
+<p>Views are templates that define how data is presented by the controllers in a Core52 application.</p>
+<p>These templates are always stored in <code>app/views</code> unless you override the <code>PATH_VIEWS</code> constant in your <code>config.php</code> file.</p>
+<h2>Parsing Engines</h2>
+<p>There are two basic template types and parsing engines in Core52, to suit your needs.</p>
+<h3>FastView</h3>
+<p>The FastView view type uses native PHP constructs and thus provides very high speed along with all the flexibility that PHP&#8217;s flow control blocks provide. A FastView template might look like this:</p>
+<p><strong>app/views/helloworld.php</strong></p>
+<pre>&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Welcome to Core52!&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;? if($logged_in): ?&gt;
+    &lt;h1&gt;Hello, &lt;?=$username;?&gt;&lt;/h1&gt;
+&lt;? else: ?&gt;
+    &lt;h1&gt;Welcome, Guest!&lt;/h1&gt;
+&lt;? endif; ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>FastView templates should end in <code>.php</code> since they are parsed by the PHP engine.</p>
+<h3>View</h3>
+<p>The View view type uses a very stripped down syntax for embedding variables into pages, and a few very basic flow control structures. A View template might look like the following:</p>
+<p><strong>app/views/helloworld.html</strong></p>
+<pre>&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Welcome to Core52!&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;!--IF logged_in--&gt;
+    &lt;h1&gt;Hello, {username}&lt;/h1&gt;
+&lt;!--ELSE logged_in--&gt;
+    &lt;h1&gt;Welcome, Guest!&lt;/h1&gt;
+&lt;!--ENDIF logged_in--&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+<p>View templates should end in <code>.html</code>.</p>
+<h2>Manipulating Views</h2>
+<p>Both the FastView and the View template parser classes implement the same interface (ViewInterface) for simplicity and to enable polymorphism with templates. However, we will be using the FastView parser in the following examples.</p>
+<h3>Instantiating the Parser</h3>
+<p>There are multiple ways to get an instance of the parser you desire, based on your context and needs.</p>
+<ol>
+<li><strong>Inside Controllers</strong>Controllers have their own view parser instance available in <code>$this-&gt;view</code>.
+<pre>$this-&gt;view-&gt;load('welcome');
+$this-&gt;view-&gt;data('logged_in', TRUE);</pre>
+<p>Note: if you&#8217;re using FastView, you&#8217;ll need to set the protected <code>$_view_type</code> property to <code>FastViewObject</code>.</li>
+<li><strong>Singleton Instance</strong>You can also access the singleton instance by calling the static functions on the <code>FastView</code> class (or the <code>View</code> class as the case may be):
+<pre>FastView::load('welcome');
+FastView::data('logged_in', TRUE);</pre>
+</li>
+<li><strong>Instantiation</strong>When instantiating, use <code>FastViewObject</code> or <code>ViewObject</code>:
+<pre>$view = new FastViewObject();
+$view-&gt;load('welcome');
+$view-&gt;data('logged_in', TRUE);</pre>
+</li>
+</ol>
+<h3>Loading Templates</h3>
+<p>To load your template, simply pass call the load() method with your template name minus the <code>.php</code> or <code>.html</code> extension. You may organize your views into subdirectories, but be sure to specify a relative path from the app/views directory:</p>
+<pre># loads app/views/admin/users.php
+FastView::load('admin/users');
+</pre>
+<p>To load from a string instead of from a file:</p>
+<pre>FastView::load_string($string);
+</pre>
+<h3>Passing Data</h3>
+<p>The data() method can take either a single associative array argument or two string arguments (key, value):</p>
+<pre># this is easy...
+FastView::data('user', $user);
+FastView::data('logged_in', TRUE);
+
+# this is also valid
+FastView::data(array(
+    'user' =&gt; $user,
+    'logged_in' =&gt; TRUE,
+));
+</pre>
+<h3>Nesting Views</h3>
+<p>Nesting other views into a FastView template is easy using the fastview_inc() or view_inc() functions:</p>
+<pre>&lt;!-- to embed a FastView template: --&gt;
+&lt;? fastview_inc('header', array('user' =&gt; $user)); ?&gt;
+
+&lt;!-- or to embed a View template: --&gt;
+&lt;? view_inc('header', array('user' =&gt; $user)); ?&gt;</pre>
+<p>The second argument allows you to pass along view data from the current context to the view that you are embedding.</p>
+<p>To embed views into a View template, use the <code>@</code> symbol:</p>
+<pre>&lt;!--@header--&gt;
+</pre>
+<p>Note: while it is possible to embed a View template into a FastView template, the reverse is not.</p>
+<h3>Global Data</h3>
+<p>Rather than manually passing along view data to nested templates, it may be more convenient to publish certain view data in the global scope:</p>
+<pre>FastView::Global_Data('logged_in', TRUE);
+</pre>
+<p><code>global_data()</code> accepts the same arguments as <code>data()</code>.</p>
+<h3>Output</h3>
+<p>At the end of your controller method, call the <code>publish()</code> method:</p>
+<pre>FastView::Publish();
+</pre>
+<p>If you would rather return the output instead of echoing it, pass <code>TRUE</code>:</p>
+<pre>$output = FastView::Publish(TRUE);
+</pre>
+<h2>View-Specific functionality</h2>
+<h3>Parsing</h3>
+<p>When using View, be sure to call the parse() method right after load():</p>
+<pre>View::Load('users');
+View::Parse();
+</pre>
+<h3>Loop Syntax</h3>
+<p>To loop on a data array, use the following syntax:</p>
+<pre>&lt;!--LOOP vars AS var--&gt;
+   Do something with {var}
+&lt;!--END LOOP vars--&gt;
+</pre>
+<h3>Conditionals</h3>
+<p>The View parser supports IF&#8230;ENDIF and IF&#8230;ELSE&#8230;ENDIF constructs:</p>
+<pre>&lt;!--IF var--&gt;
+   Something
+&lt;!--ENDIF var--&gt;
+
+&lt;!--IF var--&gt;
+   Something
+&lt;!--ELSE var--&gt;
+   Something else
+&lt;!--ENDIF var--&gt;
+</pre>
+<h3>Reaching into arrays and objects</h3>
+<p>View treats arrays and objects basically the same. Use a colon syntax to reach into arrays and objects:</p>
+<pre>&lt;h1&gt;Welcome, {user:name}!&lt;/h1&gt;
+</pre>
+<h3>Holders</h3>
+<p>Embedding a holder tag enables you to select which view template to nest inside your main template from the controller side.</p>
+<p><strong>View:</strong></p>
+<pre>&lt;!-- serves as a placeholder for another view template which will be inserted here --&gt;
+%holder:holder_label%
+
+&lt;!-- this also works --&gt;
+%holder:{holder_label}%
+</pre>
+<p><strong>Controller:</strong></p>
+<pre>View::Holder('holder_label', 'view_template');
+</pre>

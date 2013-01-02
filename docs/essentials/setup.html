@@ -1,0 +1,141 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Setup
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Setup</h1>
+
+<h2>Recommended PHP Settings</h2>
+<p>For security and ease of use, the following PHP settings are <strong>strongly recommended</strong>:</p>
+<ul>
+<li><code>magic_quotes_gpc</code> = Off</li>
+<li><code>error_reporting</code> = <code>E_ALL &amp; ~E_NOTICE</code></li>
+</ul>
+<h2>File Structure</h2>
+<p>The basic file structure of a Core52 site should look like this:</p>
+<pre>[webroot]/
+   --app/
+      --controllers/
+      --helpers/
+      --models/
+      --objects/
+      --static/
+      --views/
+      --config.php
+   --core/
+</pre>
+<p>Your project should be set up so that the <code>controllers</code> directory is the document root. If you are using Apache, this is most  easily done by defining a virtual host. See &#8220;Setting up your Web Server&#8221;  below.</p>
+<ul>
+<li>The <code>app</code> directory contains all your application controllers, models, libraries, templates (views), and static files (such as images, javascript, and CSS files).</li>
+</ul>
+<ul>
+<li>The <code>core</code> directory contains the Core52 framework. There is a sample <code>app</code> directory in the <code>core</code> directory which you can use as a template for your project.</li>
+</ul>
+<ul>
+<li><code>app/config.php</code> defines your application name, which is used when loading your authorization file, where you can define database connections and other sensitive items. See &#8220;Configuration&#8221; below.</li>
+</ul>
+<h2>URL Components</h2>
+<p>Core52 is designed for search engine optimized clean URLs throughout (although it doesn't stop you from passing in GET query parameters at will).</p>
+<p><strong>http://your-app-name.dev/[index.php]/<span style="color: #00ff00;">controller</span>/<span style="color: #3366ff;"><strong>method</strong></span></strong><strong>/</strong><strong><span style="color: #ff0000;">a</span></strong><strong>/</strong><strong><span style="color: #ff0000;">b</span></strong><strong>/</strong><strong><span style="color: #ff0000;">c</span></strong><strong>/</strong><strong><span style="color: #ff0000;">&#8230;</span></strong></p>
+<ul>
+<li><strong><span style="color: #00ff00;">controller</span></strong> &#8211; This segment maps to the filename of a controller. If no controller is found, then an HTTP 404 error will be displayed automatically.</li>
+</ul>
+<ul>
+<li><strong><span style="color: #3366ff;">method</span></strong> &#8211; This segment maps to a method within a controller. If no method is specified, Core52 looks for a <code>_default()</code>method and runs it. If no method is run, or if no output is sent, then an HTTP 404 error will be shown.Optionally, colon-delimited arguments can be attached to the <span style="color: #3366ff;"><strong>method</strong></span> URL segment. These arguments will be passed in sequence to your controller method as arguments.</li>
+</ul>
+<ul>
+<li><span style="color: #ff0000;"><strong>Higher segments</strong></span> can optionally be used as parameters to your application. By default, they are ignored by Core52.</li>
+</ul>
+<p>To eliminate the <strong>index.php</strong> from the URL, you'll need a .htaccess file in your controllers directory (again, assuming you use Apache and Mod_Rewrite):</p>
+<pre>php_flag magic_quotes_gpc Off
+
+RewriteEngine on
+RewriteCond $1 !^(_initialize\.php|static|favicon\.ico)
+RewriteRule ^(.*)$ /_initialize.php/$1 [L]
+
+Options +FollowSymlinks -MultiViews</pre>
+<h2>Setting up your Web Server</h2>
+<p>In most cases, you'll want to define an Apache virtual host for your  project. Note that the only directories that are exposed to the web are <code>controllers</code> and <code>static</code>:</p>
+<pre>&lt;VirtualHost *:80&gt;
+  ServerName your-app-name.dev
+  DocumentRoot /www/vhosts/your-app-name/app/controllers
+
+  &lt;Directory "/www/vhosts/your-app-name/app/controllers"&gt;
+    Options All
+    AllowOverride All
+    order allow,deny
+    allow from all
+  &lt;/Directory&gt;
+
+  Alias /static "/www/vhosts/your-app-name/app/static"
+  &lt;Directory "/www/vhosts/your-app-name/app/static"&gt;
+    Options All
+    AllowOverride All
+    order allow,deny
+    allow from all
+  &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</pre>
+<p>If you cannot use a virtual host, there are other ways to set up  Core52. See &#8220;Using Core52 In a Non-vhost Environment&#8221;.</p>
+<h2>Configuration</h2>
+<ol>
+<li>Set two constants, <code>APP_NAME</code> and <code>PATH_AUTH</code>, in your <code>app/config.php</code> file:
+<pre>&lt;?php
+
+# Define the app name
+define('APP_NAME', 'your-app-name');   // stick with alphanumeric+dash
+
+# Define the path to your main configuration file
+define('PATH_AUTH', '/auth');</pre>
+</li>
+<li>Create a PHP file in a secure place on your web server that matches the value of the <code>APP_NAME</code> constant just defined. Store this file in the location you specified in <code>PATH_AUTH</code>:
+<pre>/auth/your-app-name.php</pre>
+</li>
+<li>In the file created in step 2, initialize your database connection, e-mail settings, salt, and any other settings your application might need:
+<pre>&lt;?php
+
+# error report email address (leave blank unless you're in production)
+Config::set('EMAIL_DEBUG_RCPT', '');
+
+# used for salting passwords
+Config::set('salt', '&lt;something random&gt;');
+
+# configure e-mail
+Mailer::Initialize(array(
+      'from' =&gt; 'no-reply@your-app-name.com',
+      'from_name' =&gt; 'Your App Name',
+      'word_wrap' =&gt; 75,
+      #'smtp' =&gt; TRUE,
+      #'smtp_host' =&gt; 'smtp.your-app-name.com',
+      #'smtp_port' =&gt; 25,
+      #'smtp_user' =&gt; 'admin@your-app-name.com',
+      #'smtp_pass' =&gt; '&lt;password&gt;',
+      #'smtp_timeout' =&gt; '10',
+));
+
+# create a database connection object labeled 'primary-db'
+DatabaseConnection::factory('primary-db', array(
+	'host'	=&gt; 'localhost',
+	'user'	=&gt; '&lt;dbuser&gt;',
+	'pass'	=&gt; '&lt;password&gt;',
+	'db'	=&gt; '&lt;dbname&gt;',
+	'debug'	=&gt; TRUE,     // enable query backtrace
+	'persist' =&gt; FALSE,  // disable persistent database connections
+), TRUE); // setting the final arg TRUE indicates this connection should be the default
+
+# register the default database connection
+Database::Initialize('primary-db');
+</pre>
+</li>
+</ol>
+<p>That's it! Now go write your first controller.</p>

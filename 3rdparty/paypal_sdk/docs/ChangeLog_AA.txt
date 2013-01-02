@@ -1,0 +1,15 @@
+PayPal Platform PHP SDK
+=====================================================================================================================================
+Version 1.1.0 - 19/02/2010
+1.XML request and response data binding support has been included in SDK core library- Thin wrapper APIs for AdaptiveAccounts web service APIs.
+2.JSON request and response data binding support has been included in SDK core library.
+3.Commandline and Web samples support XML ,JSON and SOAP bindings
+=====================================================================================================================================
+Version 1.0.0 - 14/10/2009
+1 - SDK core library- Thin wrapper APIs for AdaptiveAccounts web service APIs.
+2 - Command line samples in the file CommnadLineSamples.php for AdaptiveAccounts in <instal_dir>/samples/ folder
+3 - A simplistic reference implementation (web samples) of the APIs using PHP. Tested with PHP 5.2.10 and Apache 2.2 web server.     
+4 - Source code for core library and web samples. The core library is in <instal_dir>/samples/web/lib folder
+5 - Logging. All the requests and responses are logged to paypal.log file using Open sourec Log library which is re-distribued.
+=====================================================================================================================================
+    

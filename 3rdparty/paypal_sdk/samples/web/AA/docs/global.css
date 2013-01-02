@@ -1,0 +1,557 @@
+/* 
+	Title: global.css
+	Author Name: Eddie T. Lou
+	Author Date: 11.30.2006
+	Description: Rules for interface elements that appear on Integration Center v2.  Tested on IE 6.0 and Firefox 1.5.0.8.
+
+	Notes: Please do not modify this file unless you know what you are doing.  
+*/
+
+
+/* GLOBAL ELEMENTS */
+
+body
+{
+	background-color: #efefef;
+	color: #333;
+	font: normal .7em "Verdana", "Arial", sans-serif;
+	margin: 0;
+}
+pre
+{
+	font-size: 120%;
+}
+a
+{
+	color: #369;
+	text-decoration: none;
+}
+a:hover
+{
+	text-decoration: underline;
+}
+img
+{
+	border: 0;
+}
+p
+{
+	margin: 10;
+	padding-top: 10px;
+	width: 800px;
+}
+h5
+{
+	font-size: 100%;
+	font-weight: bold;
+	margin: 10px 0 0;
+}
+
+
+/* GLOBAL CLASSES */
+
+hr.divider
+{
+	display: none;
+}
+span.note
+{
+	color: #f00;
+}
+
+
+/* PAGE LEVEL */
+
+#page
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/scr/src_ic_bg_gradient.jpg") repeat-y;
+	margin: 0 auto;
+	width: 785px;
+}
+
+
+/* HEADER AREA */
+
+#header
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/scr/src_ic_header_gradient.jpg") repeat-x;
+	margin: 0 auto;
+	overflow: auto;
+	padding: 18px 0 21px 0;
+	width: 771px;
+}
+#logo-paypal
+{
+	float: left;
+	padding-left: 20px;
+}
+
+
+/* GLOBAL NAVIGATION AT THE TOP RIGHT CORNER */
+
+#nav-global
+{
+	float: right;
+	margin: 0;
+	padding-right: 10px;
+}
+#nav-global li
+{
+	display: inline;
+	border-left: 1px solid #a9c9e9;
+	list-style-type: none;
+	padding: 0 5px;
+}
+#nav-global li.first
+{
+	border-left: 0;
+}
+
+
+/* NAVIGATION MENU AREA */
+
+#nav-menu
+{
+	float: left;
+	padding: 7px 0 0 16px;
+	width: 176px;
+}
+#nav-menu ul, #nav-menu ul li
+{
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+#nav-menu ul
+{
+	border: 1px solid #e5e5e5;
+	border-top: 0;
+}
+#nav-menu ul.nav-primary, #nav-menu ul.nav-secondary
+{
+	margin-bottom: 5px;
+}
+
+
+/* PRIMARY NAVIGATION USES THE BLUE HEADER BACKGROUND */
+
+#nav-menu ul.nav-primary li h3
+{
+	background: #a9c9e9 url("../../../en_US/i/IntegrationCenter/scr/src_ic_secnav_h1_bg.jpg") repeat-x;
+	color: #036;
+	font: bold 120% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+	margin : 0 1px 1px;
+	padding: 2px 10px;
+}
+#nav-menu ul.nav-primary li h3.first
+{
+	background: #a9c9e9 url("../../../en_US/i/IntegrationCenter/scr/src_ic_secnav_h1_whole_bg.jpg") repeat-x;
+	margin : 0 -1px 1px -1px;
+}
+#nav-menu ul.nav-primary li ul
+{
+	border: 0;
+}
+#nav-menu ul.nav-primary li ul li
+{
+	padding: 0;
+}
+#nav-menu ul.nav-primary li ul li a
+{
+	background-color: #e4edf6;
+	border: 1px solid #fff;
+	border-top: 0;
+	display: block;
+	margin: 0;
+	padding: 5px 10px;
+	width: 152px;
+}
+
+
+/* SUPPORT USES THE GREY HEADER BACKGROUND */
+
+#nav-menu ul.nav-secondary li h3
+{
+	background: #e6e6e6 url("../../../en_US/i/IntegrationCenter/scr/src_ic_secnav_h2_bg.jpg") repeat-x;
+	color: #333;
+	font: bold 120% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+	margin : 0 1px 1px;
+	padding: 2px 10px;
+}
+#nav-menu ul.nav-secondary li h3.first
+{
+	background: #e6e6e6 url("../../../en_US/i/IntegrationCenter/scr/src_ic_secnav_h3_bg.jpg") repeat-x;
+	margin : 0 -1px 1px -1px;
+}
+#nav-menu ul.nav-secondary li ul
+{
+	border: 0;
+}
+#nav-menu ul.nav-secondary li ul li
+{
+	padding: 0;
+}
+#nav-menu ul.nav-secondary li ul li a
+{
+	background-color: #f7f7f7;
+	border: 1px solid #fff;
+	border-top: 0;
+	display: block;
+	margin: 0;
+	padding: 5px 10px;
+	width: 152px;
+}
+#nav-menu ul li p
+{
+	background-color: #f7f7f7;
+	margin: 0;
+	padding: 2px 10px 7px;
+}
+
+
+/* DYNAMICALLY SET THE PRIMARY NAVIGATION TO ON STATE BASED ON THE ID IN BODY TAG */
+
+body#express #nav-menu a.express, body#wp-standard #nav-menu a.wp-standard, body#wp-pro #nav-menu a.wp-pro, body#wp-pro-uk #nav-menu a.wp-pro-uk, body#pf-link #nav-menu a.pf-link, body#pf-pro #nav-menu a.pf-pro
+{
+	background-color: #369;
+	color: #fff;
+	text-decoration: none;
+}
+body#api-ref #nav-menu a.api-ref, body#testing #nav-menu a.testing, body#logo-guide #nav-menu a.logo-guide, body#kbase #nav-menu a.kbase, body#doc #nav-menu a.doc, body#glossary #nav-menu a.glossary, body#ipn #nav-menu a.ipn, body#pdt #nav-menu a.pdt, body#ipn-pdt-ref #nav-menu a.ipn-pdt-ref, body#standard-ref #nav-menu a.standard-ref, body#ewp #nav-menu a.ewp
+{
+	background-color: #ddd;
+	color: #333;
+	text-decoration: none;
+}
+
+
+/* CONTENT AREA */
+
+#content
+{
+	float: right;
+	padding: 7px 16px 0 0;
+	width: 567px;
+}
+
+
+/* IMAGE REPLACEMENT FOR HOME PAGE H1 HEADER */
+
+#content h1
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/header/hdr_main_image_sm.jpg") no-repeat top left;
+	color: #333;
+	font-size: 130%;
+	padding: 73px 0 0;
+	margin: 0;
+	width: 569px;
+}
+body#home-page #content h1
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/header/hdr_main_image.jpg") no-repeat top left;
+	color: #333;
+	font-size: 130%;
+	padding: 143px 0 0;
+	margin: 0;
+	width: 569px;
+}
+#content .intro
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/scr/src_ic_dotline.gif") repeat-x top;
+	margin: 5px 0 15px 0px;
+	overflow: auto;
+}
+#content .intro ul.highlight
+{
+	padding: 0;
+	margin: 10px 0 0;
+}
+#content .intro ul.highlight li
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow_sm.gif") no-repeat center left;
+	list-style-type: none;
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+#content .intro ul.diagram-link
+{
+	padding: 0;
+	margin: 10px 0 0;
+	float: left;
+}
+#content .intro ul.diagram-link li
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow_sm.gif") no-repeat center left;
+	list-style-type: none;
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+#content .intro .diagram-image
+{
+	float: left;
+	margin: 12px;
+}
+
+
+/* PRODUCTS SECTION WITH 2 COLUMN DESIGN */
+
+#content .products
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/scr/src_ic_ver_line_blue.gif") repeat-y top right;
+	height: 100%;
+	overflow: auto;
+}
+#content .products h2
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow.gif") no-repeat center left;
+	clear: both;
+	color: #036;
+	font: bold 120% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+	margin: 0;
+	padding-left: 13px;
+}
+#content .products h2 em
+{
+	color: #333;
+	font: bold 90% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+}
+
+
+/* LEFT COLUMN FOR PRODUCTS SECTION */
+
+#content .products .description
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/scr/src_ic_dotline.gif") repeat-x right top;
+	border-left: 13px solid #fff;
+	float: left;
+	padding-bottom: 15px;
+	width: 350px;
+}
+#content .products .description ul
+{
+	padding: 5px 0 0;
+	margin: 0;
+}
+#content .products .description ul li
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow_sm.gif") no-repeat center left;
+	list-style-type: none;
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+
+
+/* RIGHT COLUMN FOR PRODUCTS SECTION */
+
+#content .products .resources
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/scr/src_ic_dotline.gif") repeat-x left top;
+	float: left;
+	padding: 0 0 15px 15px;
+	width: 185px;
+}
+#content .products .resources h4
+{
+	font-size: 100%;
+	font-weight: bold;
+	list-style-type: none;
+	margin: 10px 0 0;
+}
+#content .products .resources ul
+{
+	margin: 0;
+	padding: 0;
+}
+#content .products .resources ul li
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow_sm.gif") no-repeat center left;
+	list-style-type: none;
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+
+
+
+#content .features
+{
+	height: 100%;
+	overflow: auto;
+}
+#content .features h2
+{
+	background: #fff url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow.gif") no-repeat center left;
+	clear: both;
+	color: #036;
+	font: bold 120% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+	margin: 0 0 0 20px;
+	padding-left: 13px;
+}
+#content .features h2 em
+{
+	color: #333;
+	font: bold 90% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+}
+#content .features .description
+{
+	border-left: 33px solid #fff;
+	float: left;
+	padding-bottom: 15px;
+}
+#content .features .description li
+{
+	padding-top: 15px;
+}
+
+
+#content .examples
+{
+	height: 100%;
+	overflow: auto;
+}
+#content .examples h2
+{
+	clear: both;
+	color: #333;
+	font: bold 120% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+	margin: 0;
+}
+#content .examples h2 em
+{
+	color: #333;
+	font: bold 90% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+}
+#content .examples .description
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/scr/src_ic_dotline.gif") repeat-x left top;
+	padding-bottom: 15px;
+}
+#content .examples table.example-definition
+{
+	border: 1px solid #e5e5e5;
+	border-collapse: collapse;
+	padding: 0;
+	margin: 0;
+}
+#content .examples table.example-definition thead tr td
+{
+	background: #666 url("../../../en_US/i/IntegrationCenter/scr/src_ic_tb_header_bg.gif") repeat-x left top;
+	border: 1px solid #fff;
+	color: #fff;
+	font-weight: bold;
+	padding: 5px;
+}
+#content .examples table.example-definition tbody tr td
+{
+	background-color: #f7f7f7;
+	border: 1px solid #fff;
+	padding: 5px;
+}
+#content .examples table.example-definition tbody tr td.label
+{
+	background-color: #ddd;
+}
+
+#content .examples ul.diagram-link
+{
+	padding: 0;
+	margin: 10px 0 0;
+	float: left;
+}
+#content .examples ul.diagram-link li
+{
+	background: transparent url("../../../en_US/i/IntegrationCenter/btn/btn_ic_orange_arrow_sm.gif") no-repeat center left;
+	list-style-type: none;
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+#content .examples .diagram-image
+{
+	float: left;
+	margin: 12px;
+}
+
+/* IN-CONTEXT SECTION */
+
+#content .context h3
+{
+	background:  #e6e6e6 url("../../../en_US/i/IntegrationCenter/scr/src_ic_sec_ct_hd_bg_grey.jpg") no-repeat;
+	clear: both;
+	color: #333;
+	font: bold 120% "Gill Sans MT", "Gill Sans", "Verdana", "Arial", sans-serif;
+	margin : 15px 0 0;
+	padding: 2px 10px;
+}
+#content .context .content
+{
+	background-color: #f7f7f7;
+	border: 1px solid #e5e5e5;
+	padding: 5px 10px;
+}
+
+
+/* FOOTER AREA */
+
+#footer
+{
+	clear: both;
+	overflow: auto;
+	padding: 0 17px 50px;
+	width: 751px;
+}
+
+
+/* BLUE NAVIGATION BAR WITHIN THE FOOTER AREA */
+
+#footer .nav-footer
+{
+	background:  #369 url("../../../en_US/i/IntegrationCenter/scr/src_ic_footer_bg_blue_sm.gif") no-repeat top left;
+	height: 100%;
+	margin: 20px 0 0;
+	overflow: auto;
+	padding: 0;
+}
+#footer .nav-footer ul
+{
+	float: left;
+	margin: 5px 0 0;
+	padding: 5px 0 5px 5px;
+}
+#footer .nav-footer ul li
+{
+	border-left: 1px solid #e4edf6;
+	display: inline;
+	list-style-type: none;
+	padding: 0 5px;
+}
+#footer .nav-footer li.first
+{
+	border-left: 0;
+}
+#footer .nav-footer a
+{
+	color: #fff;
+}
+#footer p.company
+{
+	color: #fff;
+	float: right;
+	padding: 11px 5px;
+}
+#footer div.copyright
+{
+	clear: left;
+	float: left;
+	font-size: 90%;
+	width: 400px;
+}
+
+
+/* TRUST-e AND BBB ONLINE LOGO WITHIN THE FOOTER AREA */
+
+#footer div.logo-partner
+{
+	clear: right;
+	float: right;
+	padding-top: 10px;
+	width: 238px;
+}

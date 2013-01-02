@@ -1,0 +1,70 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Errors
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Errors</h1>
+
+<h2>PHP Settings</h2>
+<p>Core52 is not designed for the E_ALL error reporting level. On startup, Core52 sets the following PHP settings:</p>
+<ul>
+<li><code>error_reporting</code> =&gt; <code>E_ALL ^ E_NOTICE</code></li>
+<li><code>ASSERT_ACTIVE</code> =&gt; <code>0</code></li>
+<li><code>track_errors</code> =&gt; <code>On</code></li>
+</ul>
+<p>Core52 also defines its own error handler via <code>set_exception_handler()</code> and <code>set_error_handler()</code>. Do not override these, see the &#8220;Defining Custom Error Handlers&#8221; section below.</p>
+<h2>Errors vs Exceptions</h2>
+<p>PHP5 Exceptions are the preferred way to indicate an error in Core52 applications. However, non-fatal PHP errors are also caught by Core52 error reporting functionality (PHP errors are translated to exceptions via <code>ErrorException</code>).</p>
+<p>Where possible, use <code>throw new Exception</code> instead of <code>trigger_error()</code> in your application code.</p>
+<h2>Core52 Exceptions</h2>
+<p>The following Exceptions are defined in Core52 (of course, you are free to add your own):</p>
+<ul>
+<li><code>CoreException</code> &#8211; something went wrong in the core of the framework</li>
+<li><code>FatalErrorException</code> &#8211; unrecoverable fatal error</li>
+<li><code>DatabaseException</code> &#8211; database query or connection error</li>
+<li><code>PageNotFoundException</code> &#8211; triggers an HTTP 404 (automatically thrown if no output is shown)</li>
+<li><code>AutoClassLoaderException</code> &#8211; autoloader could not find class file</li>
+</ul>
+<p>PHP&#8217;s Standard Public Library also provides some <a href="http://us2.php.net/manual/en/spl.exceptions.php" target="_blank">predefined exceptions</a> that you can take advantage of.</p>
+<h2>Defining Custom Error Handlers</h2>
+<p>For custom error handlers, use <code>core_set_exception_handler()</code> and <code>core_unset_exception_handler()</code> to set and unset custom error handlers:</p>
+<pre># push a new exception handler onto the stack
+# if $callback is not callable, it will throw an Exception
+core_set_exception_handler($callback);
+
+# unset a specific exception handler
+core_unset_exception_handler($callback);
+
+# pop the last exception handler off the stack
+core_unset_exception_handler();
+</pre>
+<h2>Enabling Error Report Emails</h2>
+<p>In production mode, you don&#8217;t want to show exception error messages and backtraces for both user experience reasons and for security.</p>
+<p>Core52 can email error reports to one or multiple email addresses, along with $_GET, $_POST, and Session data. To enable this, simply initialize the Mailer object and set the EMAIL_DEBUG_RCPT setting in your auth file:</p>
+<pre># error report email address (leave blank unless you're in production)
+# you can set an array of email addresses if you need the report sent to multiple locations
+Config::set('EMAIL_DEBUG_RCPT', 'administrator@your-app-name.com');
+
+# configure e-mail
+Mailer::Initialize(array(
+      'from' =&gt; 'no-reply@your-app-name.com',
+      'from_name' =&gt; 'Your App Name',
+      'word_wrap' =&gt; 75,
+      #'smtp' =&gt; TRUE,
+      #'smtp_host' =&gt; 'smtp.your-app-name.com',
+      #'smtp_port' =&gt; 25,
+      #'smtp_user' =&gt; 'admin@your-app-name.com',
+      #'smtp_pass' =&gt; '&lt;password&gt;',
+      #'smtp_timeout' =&gt; '10',
+));
+</pre>

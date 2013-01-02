@@ -1,0 +1,270 @@
+<html>
+<head>
+    <title>PayPal Platform PHP SDK</title>
+    <link href="docs/global.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <h1 align='center'>
+        PayPal Platform PHP SDK</h1>
+    <h2>
+        Overview</h2>
+    <p>
+        The PayPal's Software Developer Kit (SDK) eases the process of integrating PayPal's
+        financial services(WebServices) into your application by providing a core library,
+        command line and web samples. This software is intended for use by software developers
+        with a basic understanding of the selected platform's language (PHP) and environment.
+    </p>
+    <b>Features supported by PHP SDK:</b> </br>
+    <ul>
+        <li><b>Simple Wrapper APIs:</b>
+            <p>
+            The SDK provides simple APIs to consume AdaptiveAccounts APIs or Web Services. You
+            can program to the APIs as though they are local Classes/Objects </li>
+        </p>
+        <li><b>Client Authentication over SSL:</b>
+            <p>
+                Two types of API credentials, namely <b>Three Token and Client Auth SSL certificate</b>
+                are supported by PayPal. A merchant or application developer should have an appproriate(Typically
+                a business type) account created by signing onto PayPal site. After creating an
+                account he/she can choose to have either type of the credentials. Every API call
+                should be accompanied by the API credentials as part of the HTTP headers. This is
+                required in addition to the SSL layer in which the transaction takes place. The
+                SDK does the heavy lifting of setting up the SSL context and communication. A property
+                file namely <b>paypal_sdk_clientproperties.php </b>is used to configure credentials
+                and other properties. The property section explain each properties used by SDK and
+                how to configure them in detail.</p>
+        </li>
+        <li><b>Message protocol Support: </b>
+            <p>
+                The PayPal Platform WebService APIs support various request and response data bindings
+                or payload formats (NV, JSON, XML, and SOAP).This PHP SDK supports <b>JSON, XML, and SOAP </b>bindings or payload formats.These bindings can be set in property file namely <b>paypal_sdk_clientproperties.php
+	</b></p>
+        </li>
+        <li><b>Command line samples and reference implementations:</b>
+            <p>
+                of PayPal APIs are supplied with the SDK. Please read the respective sections given
+                below to know more. Command lines samples are the quickest way to learn the APIs.</p>
+        </li>
+        <li><b>Proxy/Firewall server Support:</b>
+            <p>
+                SDK can work with Proxy servers. That is SDK can make API call via proxy server/port
+                specified in the paypal_sdk_clientproperties.php file. Please see the file to know
+                how to specify it.</p>
+        </li>
+    </ul>
+    <br>
+    The latest upgrades, FAQs and announcements can always be found at: <a href='https://www.x.com'>
+        Tools for PayPal Developers</a>
+    <h2>
+        Required Software</h2>
+    <h3>
+        PHP 5.2.x</h3>
+    <p>
+        <a href='http://www.php.net/downloads.php'>Download</a>
+        <br>
+        PHP 5.2.x with CURL and openssl extensions enabled
+        <br>
+        Note: <a href='http://pear.php.net'>PEAR</a> should be installed</p>
+    <h3>
+        Apache or IIS web server</h3>
+    <p>
+        <a href='http://httpd.apache.org/download.cgi/'>Download</a>
+        <br>
+        Apache HTTP web server -If you wish to test the PHP samples, you may need to download
+        and install this. To run the web samples copy the web folder (in [install_dir /samples
+        directory] to htdocs directory of the Apache server and access it as http://localhost:[port_number]/web,
+        or http://localhost/web if your apache server is running at port 80.</p>
+    <h2>
+        WebSamples Configuration</h2>
+    Reference Implementation- <a href='docs/installingWebSamples.txt'>How To Configure PHP
+        web samples on Windows </a>, <a href='docs/installingWebSamplesInLinux.txt'>How To Configure
+            PHP web samples on Linux </a>
+    <h2>
+        Sample Programs</h2>
+    Reference Implementation- PHP web samples, Please refer the <a href='docs/installingWebSamples.txt'>
+        web samples installation instruction on windows</a>, <a href='docs/installingWebSamplesInLinux.txt'>
+            web samples installation instruction on Linux </a>
+    <br>
+    To run the command line samples, go to samples directory "php_sdk\samples\CommandLine\AA"
+    type 'run' on the Windows command prompt, type 'sh run.sh' in Terminal window on
+    Linux environment. On Linux environment please grant write access to the log file 'logs/paypal_platform.log' under CommandLine/AA. 
+    
+    </p>
+    <h2>
+        Prerequisite</h2>
+    <a href="https://www.x.com/docs/DOC-1379">How to create test sandbox account</a><br>
+    <h2>
+        Get Started with Adaptive Accounts SDK</h2>
+    <table border="30" bgcolor="aqua" height="100" width="100%">
+        <tr>
+            <td>
+                <a href="Calls.html">Start Adaptive Accounts SDK here</a>
+                <br>
+                <font size="2"><i>Before starting create your test sandbox account</i></font></a>
+            </td>
+        </tr>
+    </table>
+    <h2>
+        SDK Wrapper APIs</h2>
+    <p>
+        SDK supports Adaptive Accounts Webservice APIs at the time of writing this. Future
+        Version of SDKs may support more APIs. The wrapper APIs and other features simplifies
+        the integration of your application with PayPal. Once right API credentials other
+        properties like DNS name of the PayPal webservice are defined in property files,
+        you can start making API calls and transactions (as shown below) using the sdk artifacts/classes/APIs.
+        The SDK provide a simple interface you can program to. It also has other helper
+        methods ( such as getResult(), getErrorMessage() ) or APIs to make web programming
+        more productive. Please notice the AdaptiveAccounts class supports business methods
+        which take String as input parameter. This is to aid web programming.
+        <h3>
+            Adaptive Accounts</h3>
+        <pre>
+			// Create Account
+			$aa = new AdaptiveAccounts();
+			
+			$CARequest = new CreateAccountRequest();
+			$CARequest->accountType = 'PERSONAL';
+
+			$address = new AddressType();
+			$address->city = 'Austin';
+			$address->countryCode = 'US';
+			$address->line1 = '1968 Ape Way';
+			$address->line2 = 'Apt 123';
+			$address->postalCode = '78750';
+			$address->state = 'TX' ;
+			$CARequest->address = $address;
+
+			$CARequest->citizenshipCountryCode = 'US';
+			$CARequest->clientDetails = new ClientDetailsType();
+			$CARequest->clientDetails->applicationId ="APP-80W284485P519543T";
+			$CARequest->clientDetails->deviceId = "127001";
+			$CARequest->clientDetails->ipAddress = "127.0.0.1";
+
+			$CARequest->contactPhoneNumber = '512-691-4160';
+			$CARequest->currencyCode = 'USD';
+			$CARequest->dateOfBirth = '1968-01-01';
+			
+			$name = new NameType();
+			$name->firstName = 'Bonzop' ;
+			$name->middleName = 'Simore';
+			$name->lastName = 'Zaius';
+			$name->salutation = 'Dr.';
+			$CARequest->name = $name;
+			
+			$CARequest->notificationURL = 'http://stranger.paypal.com/cgi-bin/ipntest.cgi';
+			$CARequest->partnerField1 = 'p1';
+			$CARequest->partnerField2 = 'p2';
+			$CARequest->partnerField3 = 'p3';
+			$CARequest->partnerField4 = 'p4';
+			$CARequest->partnerField5 = 'p5';
+			$CARequest->preferredLanguageCode = "en_US";
+			
+			$rEnvelope = new RequestEnvelope();
+			$rEnvelope->errorLanguage = "en_US";
+			$CARequest->requestEnvelope = $rEnvelope ;
+			
+			$aa = new AdaptiveAccounts();
+			$response=$aa->CreateAccount($CARequest);
+			
+			if(strtoupper($aa->isSuccess) == 'FAILURE')
+			{
+				$soapFault = $aa->getLastError();
+				echo "Transaction CreateAccount Failed: error Id: ";
+				if(is_array($soapFault->error))
+		        {
+		        	echo $soapFault->error[0]->errorId . ", error message: " . $soapFault->error[0]->message ;
+		        }
+		        else
+		        {
+		        	echo $soapFault->error->errorId . ", error message: " . $soapFault->error->message ;
+		        }
+				
+			}
+			else
+			{
+				echo "CreateAccount Transaction Successful! \n";
+			}
+			
+			//GetUserAgreement
+			$GUAgreementRequest = new GetUserAgreementRequest();
+			$GUAgreementRequest->countryCode = 'US';
+			$GUAgreementRequest->languageCode = "en_US";
+			$rEnvelope = new RequestEnvelope();
+			$rEnvelope->errorLanguage = "en_US";
+			$GUAgreementRequest->requestEnvelope = $rEnvelope ;
+	       
+			$response=$aa->GetUserAgreement($GUAgreementRequest);
+			
+	  		if(strtoupper($aa->isSuccess) == 'FAILURE')
+			{
+				$soapFault = $aa->getLastError();
+				echo "Transaction GetUserAgreement Failed: error Id: ";
+				if(is_array($soapFault->error))
+		        {
+		        	echo $soapFault->error[0]->errorId . ", error message: " . $soapFault->error[0]->message ;
+		        }
+		        else
+		        {
+		        	echo $soapFault->error->errorId . ", error message: " . $soapFault->error->message ;
+		        }
+				
+			}
+			else
+			{
+				echo "Account GetUserAgreement Transaction Successful! \n";
+			}
+		</pre>
+        <h2>
+            Logging</h2>
+        <p>
+            All requests and respones are logged to paypal_platform.log file using Open Source
+            Log Library. To Change the name or location of the log file, you need to replace
+            paypal_platform.log in the following line in paypal_sdk_clientproperties.php file,
+            define('LOGFILENAME','logs/paypal_platform.log');</p>
+        <h2>
+            Property Files and Configurations</h2>
+        <p>
+            In order to make successful web service calls, paypal_sdk_clientproperties.php file
+            should contain needed information. Amongst all listed below are most important.
+            <ul>
+                <li>The API_BASE_ENDPOINT property is another one. By default it is set to https://svcs.sandbox.paypal.com/.
+                    Please note the trailing slash at the end. You need to change it to https://svcs.paypal.com/
+                    to use against live production server. Otherwise you can test the SDK against sandbox
+                    (CRI) without making any changes at all.</li>
+                <li>The API credentials section. Specify either 3-token or SSL Client Auth certificate
+                    credential details such as API Username, password, and signature or path of the
+                    pem file location. The files are already configured to use a common/shared public
+                    account against PayPal CRI or sandbox environment. The samples will run as is with
+                    out any configuration changes at all. If you are using a proxy server then specify
+                    the hostname and port, and other information in the proxy server section of paypal_sdk_clientproperties.php
+                    file.</li>
+                <li>API_VERSION. You need to set it to right version to take advantage of the corresponding
+                    version features</li>
+                <li>
+                API_AUTHENTICATION_MODE - Set it to 'ssl' if you are using SSL certificate as API
+                credential.</li>
+		<li>X_PAYPAL_REQUEST_DATA_FORMAT - Set it to JSON or XML or SOAP bindings. </li>
+		<li>X_PAYPAL_RESPONSE_DATA_FORMAT - Set it to JSON or XML or SOAP bindings.</li>
+		<li>We recommend to use the same binding for both Request and Response</li>
+            </ul>
+            <h2>
+                web_constants.php and Configurations</h2>
+            <p>
+                Any constants being re-used by the web pages go here. Currently two constants which
+                define PayPal redirect URL and DeveloperPortal URL are defined in here.
+            </p>
+            <h2>
+                Documentation</h2>
+            <p>
+                <a href='https://www.x.com'>PayPal Integration Center</a>
+                <br>
+                <a href='https://www.x.com'>Technical Support</a></p>
+            <h2>
+                Licensing</h2>
+            <p>
+                Read the <a href='docs/License/LICENSE.txt'>license</a> file for important legal
+                information regarding the PayPal SDK. There are important points you must consider
+                when choosing to bundle this SDK within your application.</p>
+    Copyright (c) 2009 PayPal, Inc.
+</body>
+</html>

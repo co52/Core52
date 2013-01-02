@@ -1,0 +1,304 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="forms" title="Forms">Forms</a>
+			<span class="sep">/</span>
+			Validation Rules
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Validation Rules</h1>
+
+<h2>Predefined Validation Rules</h2>
+<table border="0" width="100%">
+<thead>
+<tr>
+<th>Rule</th>
+<th>Description</th>
+<th>Parameters</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>required</code></td>
+<td>Required</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>required_file</code></td>
+<td>Required (file upload)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>required_if</code></td>
+<td>Required if another field is present or another field equals a specific value</td>
+<td><code>another_field[=value]</code></td>
+<td><code>required_if[type=corporation]</code></td>
+</tr>
+<tr>
+<td><code>required_unless</code></td>
+<td>Required unless another field is present or another field equals a specific value</td>
+<td><code>another_field[=value]</code></td>
+<td><code>required_unless[type=corporation]</code></td>
+</tr>
+<tr>
+<td><code>values</code></td>
+<td>Value is one of the values specified using the values parameter</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>matches</code></td>
+<td>Value matches another field&#8217;s value</td>
+<td><code>another_field</code></td>
+<td><code>matches[password2]</code></td>
+</tr>
+<tr>
+<td><code>min_value</code></td>
+<td>Field must be &gt;= specified value</td>
+<td><code>value</code></td>
+<td><code>min_value[3]</code></td>
+</tr>
+<tr>
+<td><code>max_value</code></td>
+<td>Field must be &lt;= specified value</td>
+<td><code>value</code></td>
+<td><code>max_value[5]</code></td>
+</tr>
+<tr>
+<td><code>exact_value</code></td>
+<td>Field must equal specified value</td>
+<td><code>value</code></td>
+<td><code>exact_value[15]</code></td>
+</tr>
+<tr>
+<td><code>min_length</code></td>
+<td>Length of field value must be &gt;= specified value</td>
+<td><code>value</code></td>
+<td><code>min_value[3]</code></td>
+</tr>
+<tr>
+<td><code>max_length</code></td>
+<td>Length of field value must be &lt;= specified value</td>
+<td><code>value</code></td>
+<td><code>max_value[5]</code></td>
+</tr>
+<tr>
+<td><code>exact_length</code></td>
+<td>Length of field value must equal specified value</td>
+<td><code>value</code></td>
+<td><code>exact_length[2]</code></td>
+</tr>
+<tr>
+<td><code>alpha</code></td>
+<td>Letters only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>alpha_numeric</code></td>
+<td>Letters and numbers only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>alpha_numeric_space</code></td>
+<td>Letters, numbers, and spaces only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>alpha_dash</code></td>
+<td>Letters and dashes only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>alpha_dash_dot</code></td>
+<td>Letters, dashes, and periods (.) only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>numeric_dash</code></td>
+<td>Numbers and dashes only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>numeric</code></td>
+<td>Numbers only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>boolean</code></td>
+<td>0 or 1 only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_email</code></td>
+<td>Valid e-mail address</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_phone</code></td>
+<td>Valid phone (<code>N-NNN-NNN-NNNN</code>)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_url</code></td>
+<td>Valid URL</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_username</code></td>
+<td>Letters, numbers, spaces, dashes, underscores, and periods only</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_ip</code></td>
+<td>Valid IPv4 address (<code>NNN.NNN.NNN.NNN</code>)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_base64</code></td>
+<td>Valid Base64-encoded data</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_image</code></td>
+<td>Valid image (all formats supported by GD)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>filetype</code></td>
+<td>Checks MIME type of file (equires the <code>Finfo</code> PEAR extension)</td>
+<td><code>mime_type[,mime_type...]</code></td>
+<td><code>filetype[image_png,image_png]</code></td>
+</tr>
+<tr>
+<td><code>valid_month</code></td>
+<td>Valid month (number, 1-12)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_day</code></td>
+<td>Valid day of month (number, 1-31)</td>
+<td><code>month_field,year_field</code></td>
+<td><code>valid_day[month,year]</code></td>
+</tr>
+<tr>
+<td><code>valid_year</code></td>
+<td>Valid four-digit year</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_date</code></td>
+<td>Valid date or timestamp (checks via <code>strtotime()</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>after</code></td>
+<td>Checks if date falls after another date field</td>
+<td><code>another_date_field</code></td>
+<td><code>after[event_start]</code></td>
+</tr>
+<tr>
+<td><code>on_or_after</code></td>
+<td>Checks if date falls on or after another date field</td>
+<td><code>another_date_field</code></td>
+<td><code>on_or_after[event_start]</code></td>
+</tr>
+<tr>
+<td><code>valid_time</code></td>
+<td>Valid time (<code>HH:MM:SS</code> or <code>H:MM:SSAA</code>)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_creditcard_type</code></td>
+<td>VISA, MC, AMEX, DISC</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_creditcard</code></td>
+<td>Checks CC using Luhn&#8217;s algorithm</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>valid_creditcard_exp</code></td>
+<td>Checks format and expiration of CC exp date (<code>MMYY</code>)</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Custom Validation Rules</h2>
+<p>Occasionally you will need a validation rule that performs some sort of special application logic, such as a login validation rule.</p>
+<p>Follow this pattern when writing custom validation functions:</p>
+<pre>/**
+ * custom_validation_function - example form validation callback
+ *
+ * @param string $str Submitted value
+ * @param string $parameters Rule configuration options passed in square brackets []
+ * @param string $field Name of field being validated
+ * @param Form $form Form instance
+ * @return boolean
+ */
+function custom_validation_function($str, $parameters, $field, Form $form) {
+
+    # Register the error message for this rule.
+    #
+    # The first occurrence of %s in your error message will be replaced with
+    #   the human-friendly field label
+    # The second occurrence of %s will be replaced with whatever parameters
+    #   you passed the rule in square brackets
+    $form-&gt;set_error_message('custom_validation_function', '%s is not an accepted value.');
+
+    if(empty($str)) {
+
+        # Important - assume valid if no value passed.
+        # Let the require rule handle empty strings!
+        return TRUE;
+
+    } else {
+
+        if(/* validation expression */) {  // invalid!
+
+            # flag an error for the current field
+            # pass the field and the rule name
+            $form-&gt;set_error($field, 'custom_validation_function');
+
+            return FALSE;
+
+        } else {  // valid!
+
+            return TRUE;
+        }
+    }
+}
+</pre>
+<p>To call this rule, simply add <code>custom_validation_function</code> to the list of rules for the desired field (see &#8220;Setting Up Your Form&#8221; on the <a href="../forms">Forms</a> page).</p>

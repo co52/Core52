@@ -1,0 +1,108 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="database-access" title="Database Access">Database Access</a>
+			<span class="sep">/</span>
+			Building Queries
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Shortcuts</h1>
+
+<p>The <code>Database</code> class is provides a number of static shortcut methods to some of the common tasks you&#8217;ll encounter, eliminating some of the complexity provided by <code>DatabaseQuery</code> and <code>DatabaseConnection</code>.</p>
+<h2>Initialization</h2>
+<p>Before you can use <code>Database</code>, you must first initialize, preferably in your authentication file:</p>
+<pre># Set the connection handle you want Database to use
+Database::Initialize('default-database-connection-name');
+</pre>
+<h2>Finding</h2>
+<p>Each of these methods return a <code>DatabaseResult</code> object.</p>
+<h3>Database::Find($table, $where, $order, $limit)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table)-&gt;where($where)-&gt;order_by($order)-&gt;limit($limit[0], $limit[1]);
+</pre>
+<h3>Database::FindFirst($table, $where)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table)-&gt;where($where)-&gt;limit(1);</pre>
+<h3>Database::FindById($table, $id, $col = &#8216;id&#8217;)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table)-&gt;where(array($col =&gt; $id));</pre>
+<h3>Database::findSelArray($table, $key, $value, $where, $order)</h3>
+<p>Returns an associative array, with both the keys and the values coming from columns in the result set:</p>
+<pre># returns an associative array with
+# the values from the id column as the keys, and
+# the values from the name column as the values
+$users = Database::findSelArray('users', 'id', 'name');
+</pre>
+<p>You can also concatenate several column values together as the array value. Do this by passing <code>array($delimiter, $key, $value)</code> as <code>$value</code>:</p>
+<pre>$users = Database::findSelArray('users', 'id', array(' - ', $name, $age));
+</pre>
+<p>The resulting array will look something like:</p>
+<pre>array(
+    10 =&gt; 'Bob - 25',
+    12 =&gt; 'Joe - 33',
+    ...
+)
+</pre>
+<h2>Counting</h2>
+<p>Returns a <code>DatabaseResult</code> object.</p>
+<h3>Database::count($table, $where)</h3>
+<p>Equivalent to:</p>
+<pre>return database()-&gt;start_query($table)-&gt;select("COUNT(*) AS cnt")-&gt;where($where)-&gt;run()-&gt;row()-&gt;cnt;
+</pre>
+<h2>Deleting</h2>
+<p>Each of these methods return a <code>DatabaseResult</code> object.</p>
+<h3>Database::Delete($table, $where, $limit)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table, "DELETE")-&gt;where($where)-&gt;limit($limit[0], $limit[1]);</pre>
+<h3>Database::DeleteById($id, $table, $pk)</h3>
+<pre>database()-&gt;start_query($table, "DELETE")-&gt;where(array($pk =&gt; $id));</pre>
+<h3>Database::deleteFirst($table, $where)</h3>
+<pre>database()-&gt;start_query($table, "DELETE")-&gt;where($where)-&gt;limit(1);</pre>
+<h2>Updating</h2>
+<p>Each of these methods return a <code>DatabaseResult</code> object.</p>
+<h3>Database::Update($table, $values, $where)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table, "UPDATE")-&gt;set($values)-&gt;where($where);</pre>
+<h3>Database::UpdateById($id, $table, $values)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table, "UPDATE")-&gt;set($values)-&gt;where(array('id' =&gt; $id));</pre>
+<h3>Database::toggle($id, $field, $table)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;execute("UPDATE $table SET $field = ABS($field - 1) WHERE id = '$id'");</pre>
+<h2>Inserting</h2>
+<p>Returns a <code>DatabaseResult</code> object.</p>
+<h3>Database::Create($table, $values)</h3>
+<p>Equivalent to:</p>
+<pre>database()-&gt;start_query($table, "INSERT")-&gt;set($values);</pre>
+<h2>Raw Queries</h2>
+<p>Returns a <code>DatabaseResult</code> object.</p>
+<h3>Database::e($query)</h3>
+<p>Equivalent to <code>database()-&gt;execute($query)</code></p>
+<h2>Escaping Query Data</h2>
+<h3>Database::escape($value, $options)</h3>
+<p>Equivalent to <code>database()-&gt;escape($value, $options)</code></p>
+<h2>Modifiers</h2>
+<p>These methods work just like their counterparts in <code>DatabaseQuery</code>. You can call one or more of them just prior to one of the above methods (such as <code>Database::find()</code>) to modify the query.</p>
+<ul>
+<li><code>Database::select()</code></li>
+<li><code>Database::join()</code></li>
+<li><code>Database::where()</code></li>
+<li><code>Database::where_in()</code></li>
+<li><code>Database::raw_where()</code></li>
+<li><code>Database::group_by()</code></li>
+<li><code>Database::order_by()</code></li>
+<li><code>Database::limit()</code></li>
+<li><code>Database::set()</code></li>
+</ul>
+<p>Example:</p>
+<pre># get only the name and age columns from all rows where age &gt;= 60
+Database::select('name', 'age');
+$result = Database::find('users', array('age &gt;=' =&gt; 60));
+</pre>

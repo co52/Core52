@@ -1,0 +1,136 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			Forms
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Forms</h1>
+
+<p>Core52's Form object is a powerful tool for safe and easy form processing. It handles validation, error messages, filtering and sanitizing data, and rendering form fields.</p>
+<h2>Setting Up Your Form</h2>
+<h3>Form Instance</h3>
+<pre>Form::__construct($method, $data = NULL, $sanitize = 'xss')</pre>
+<p>When creating a Form instance, you can specify the data source for input ($_GET, $_POST, $_REQUEST, or a custom array), and can enable automatic filtering of all inputs (supported threat filters are xss and sql. You can specify both using a pipe-delimited list:</p>
+<pre># use $_GET and prevent XSS and SQL Injection
+$form = new Form('get', NULL, 'xss|sql');
+</pre>
+<h3>Adding Fields</h3>
+<p>To add fields to your form, call the add_field() method. Pass an associative array with any or all of the following settings:</p>
+<dl>
+<dt><code>name</code></dt>
+<dd>(required) Form field name. Stick with letters, numbers, and underscores, and do not use brackets (if you need to support multiple values override the form field name using the attributes field below).</dd>
+<dt><code>rules</code></dt>
+<dd>(required) Pipe-delimited list of validation rules (see the table below). Checks will be run in the order  in which you list them.<strong> This setting must be specified, even if the value is blank.</strong> </dd>
+<dt><code>type</code></dt>
+<dd>Form type. Accepted values are <code>text</code> (default), <code>password</code>, <code>textarea</code>, <code>hidden</code>, <code>select</code>, <code>checkbox</code>, <code>radio</code>, and <code>upload</code>. </dd>
+<dt><code>label</code></dt>
+<dd>A (pretty) name for the form field. This will be used in error messages and when rendering the field. This can be omitted if your field name is done in snake_case (i.e. user_name in the <code>name</code> setting will produce the label &#8220;User Name&#8221;)</dd>
+<dt><code>filters</code></dt>
+<dd>Pipe-delimited list of callback functions to pre-process the submitted data. Filters are run after validation and are run in the order in which you list them. </dd>
+<dt><code>default</code></dt>
+<dd>Default value if no data is submitted.</dd>
+<dt><code>values</code></dt>
+<dd>Array of values (used for dropdowns, radio buttons, and checkboxes, or any text field with a limited specific set of valid input values. Alternately, you can pass specially formatted pipe-delimited string to have the values setting populated from a database query:</dd>
+<dd>
+<pre>table|index column|value column|where clause|order clause
+</pre>
+</dd>
+<dt><code>attributes</code></dt>
+<dd>Associative array of HTML attributes to use when rendering the form field.</dd>
+</dl>
+<p>Example:</p>
+<pre>$form-&gt;add_field(array(
+    'name' =&gt; 'username',
+    'type' =&gt; 'text',
+    'rules' =&gt; 'required|valid_username|min_length[6]',
+    'default' =&gt; $user-&gt;username,
+    'attributes' =&gt; array('id' =&gt; 'username'),
+));
+</pre>
+<p>You can pass additional settings than those accepted by <code>add_field()</code>. Any such extra fields will be treated as HTML attributes. Thus, the above example could be re-written as:</p>
+<pre>$form-&gt;add_field(array(
+    'name' =&gt; 'username',
+    'type' =&gt; 'text',
+    'rules' =&gt; 'required|valid_username|min_length[6]',
+    'default' =&gt; $user-&gt;username,
+    'id' =&gt; 'username',
+));
+</pre>
+<p>Use the <code>add_fields()</code> method to add multiple fields at once:</p>
+<pre>$form-&gt;add_fields(array(
+    array(
+        'name' =&gt; 'username',
+        'rules' =&gt; 'required',
+    ),
+    array(
+        'name' =&gt; 'password',
+        'type' =&gt; 'password',
+        'rules' =&gt; 'required',
+    ),
+));</pre>
+<h2>Controller Logic</h2>
+<p>To validate your form, call the validate() method, which will return TRUE only if it detects that the form has been submitted AND all the validation checks succeeded without errors. A typical controller code block will look like this:</p>
+<pre>$form = new Form();
+$form-&gt;add_fields($fields);
+
+# check to see if a valid form was submitted
+if($form-&gt;validate()) {
+
+    // process the form
+    // ...
+
+} elseif($form-&gt;submitted()) {
+
+    // submitted, so there must be errors
+    FastView::Data('errors' $form-&gt;errors);
+
+}
+
+FastView::Data('fields', $form-&gt;render_fields());
+</pre>
+<p>The <code>submitted()</code> method checks for the presence of a &#8220;trigger field&#8221; to determine if the form was submitted or not. By default, the trigger field is <code>form_submitted</code> although you can pass a different field name. See the &#8220;View&#8221; section below for instructions on setting up the trigger field in your form.</p>
+<h3>Handling Errors</h3>
+<p>If you prefer to display errors next to the fields they belong to, simply pass <code>$form-&gt;errors</code> to your view after running <code>$form-&gt;validate()</code>. This will be an associative array (field =&gt; error message). By default, the error messages are formatted like so:</p>
+<pre>&lt;span class="error {field}"&gt;{message}&lt;/span&gt;</pre>
+<p>Edit the public <code>wrap_field_error</code> property on your <code>Form</code> instance to modify this behavior.</p>
+<p>If you prefer a single error message at the top of your form, then call <code>$form-&gt;error_message()</code> to get an HTML list of errors which you can include in your page. The default template for the error message is:</p>
+<pre>&lt;ul&gt;&lt;!--LOOP errors AS message--&gt;&lt;li&gt;{message}&lt;/li&gt;&lt;!--END LOOP errors--&gt;&lt;/ul&gt;
+</pre>
+<p>This can be customized using the <code>set_error_template()</code> method.</p>
+<h3>Rendering</h3>
+<p>You don&#8217;t have to render all your form fields. Simply pass the associative array returned from the <code>render_fields()</code> method to your view and either loop or hand place each field.</p>
+<ul>
+<li>All fields are rendered to contain the submitted value (in case of a form error) or the default value (in case of an unsubmitted form).</li>
+<li>Dropdown option values, radio buttons, and checkboxes will be constructed from the keys (option value) and values (option label) of the values specified (see &#8220;Adding Fields&#8221; above).</li>
+<li>Radio buttons and checkboxes will be rendered as a collection of HTML fields with corresponding HTML labels in array format. Be mindful of this when building your view &#8211; you may need to loop to output all the individual fields in the collection.</li>
+<li>When an error occurs, an <code>error</code> HTML class will be added to the offending form fields.</li>
+</ul>
+<h2>Setting Up Your View</h2>
+<p>When setting up the HTML form in your view, be sure to match the method attribute to the data source you are using in your form (see the &#8220;Form Instance&#8221; section above).</p>
+<p>Also you will need to include a trigger field. This works with the default settings:</p>
+<pre>&lt;input type="hidden" name="form_submitted" value="1" /&gt;
+</pre>
+<p>A login form might look like this:</p>
+<pre>&lt;form action="/login" method="post"&gt;
+  &lt;input type="hidden" name="form_submitted" value="1" /&gt;
+
+  &lt;p&gt;&lt;?=$fields['username'];&gt; &lt;?=$errors['username'];?&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;?=$fields['password'];?&gt; &lt;?=$errors['password'];?&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type="submit" value="Log In" /&gt;&lt;/p&gt;
+&lt;/form&gt;
+</pre>
+<h2>Fetching Submitted Data</h2>
+<p>If you&#8217;re using $_GET or $_POST you might be tempted to fetch the submitted data from those arrays. If you do this you will not benefit from the sanitation and filtering features that the Core52 Form object provides.</p>
+<p>The correct way to fetch data is to use the field() method:</p>
+<pre>$username = $form-&gt;field('username');
+</pre>
+<p>Sanitizing on a per-field basis can be done by passing the desired setting as the second parameter:</p>
+<pre>$username = $form-&gt;field('username', 'sql');  // sanitize for SQL injection
+</pre>

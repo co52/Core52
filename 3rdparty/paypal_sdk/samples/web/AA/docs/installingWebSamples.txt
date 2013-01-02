@@ -1,0 +1,22 @@
+The following instructions guide you through to install web samples on clean environment.
+
+Web samples Quick installation steps 
+
+1) Install Apache HTTP Server version 2.x
+2) Install PHP 5.2.x(with curl and openssl support) and configure with Apache HTTP Server
+	Install PEAR Package Manager
+3) Install web samples (php_sdk\samples\web) into htdocs directory
+ 
+Web Samples Detailed installation steps
+
+1) Apache Web Server
+	Download Apache HTTP Server. Download the 2.x release and double click it, let it install.
+2) Install PHP
+	Download and Install PHP 5.2.x version from php.net. And enable curl and openssl extensions while installation.
+2.1) PEAR Extension
+	PEAR is an extension for PHP. These days PEAR is included with PHP, but you need to install it yourself. 
+	Open a command line window (i.e. Start->Run->cmd)
+	Go to the PHP directory, for example C:\php. Type go-pear.bat. Follow the instructions.
+	The PEAR extension will get installed in C:\php\PEAR directory.
+3) Deployment of Web Sample
+	Copy the web folder from (php_sdk\samples\web) to Apache htdocs folder and browse the web sample using (http://localhost/web) if Apache is running at port 80.

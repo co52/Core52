@@ -1,0 +1,37 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="forms" title="Forms">Forms</a>
+			<span class="sep">/</span>
+			Client-Side Validation
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Client-Side Validation</h1>
+
+<p>Core52 includes a Javascript module that allows you to leverage all the power of the Form server-side validation rules on the client side via AJAX, all without any additional coding work on your part.</p>
+<h2>How it Works</h2>
+<ol>
+<li>Unobtrusive Javascript binds to the blur event on your form fields, and submits the form via AJAX with one additional special parameter (<code>__validate</code>) which indicates this is an AJAX validation call to the controller.</li>
+<li>Based on the value of the <code>__validate</code> parameter, <code>Form::validate()</code> will either validate a single field or the entire form, and send the results back (including any errors found) via JSON to the client.</li>
+<li>Server processing stops at the end of the <code>validate()</code> method, so that the rest of your normal controller logic is not run erroneously by an AJAX call.</li>
+<li>The offending field is highlighted and the error message appended to the end of the parent HTML tag&#8217;s content.</li>
+</ol>
+<h2>Activating</h2>
+<p>To enable this functionality, simply make the following changes to your views, include the latest jQuery library and then simply copy the <code>core/js/core52.form.js</code> file to your static directory and include it in your page.</p>
+<pre>&lt;script type="text/javascript" src="/static/js/jquery.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/static/js/core52.form.js"&gt;&lt;/script&gt;
+</pre>
+<p>You must also ensure that each form field is contained in its own parent HTML tag, so that the error messages will appear where they need to. Paragraphs, list items, or table cells all work well for this purpose.</p>
+<h2>Excluding Forms and Fields</h2>
+<p>You may not always want every field validated this way, or some forms may not need validating. To exclude a form, add a <code>noscript</code> class:</p>
+<pre>&lt;form action="..." method="post" class="noscript"&gt;
+</pre>
+<p>Excluding specific fields works the same way:</p>
+<pre>&lt;input name="password" type="password" class="noscript" /&gt;</pre>

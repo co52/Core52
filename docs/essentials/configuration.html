@@ -1,0 +1,112 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="essentials" title="Essentials">Essentials</a>
+			<span class="sep">/</span>
+			Controllers
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Controllers</h1>
+
+<h2>Usage</h2>
+<p>Controllers are designed to contain application logic. Controllers retrieve and process data using Models, and present the data using Views.</p>
+<p>Store controllers in your <code>app/controllers</code> directory.</p>
+<h3>Naming</h3>
+<ul>
+<li>Don&#8217;t use weird characters in your controller names. Stick with letters,  numbers, and underscores. Don&#8217;t start a controller name with a number.</li>
+<li>Controller file names must be lowercase.</li>
+<li>Use <code>Capitalized_Snake_Case</code> for controller class names.</li>
+</ul>
+<h3>Hello, World!</h3>
+<p>Basic controller structure is very simple. Here is a basic example (<code>app/controllers/welcome.php</code>):</p>
+<pre>&lt;?php
+
+class Controller_Welcome extends Controller {
+
+    # http://your-app-name.dev/welcome/test
+    public function test() {
+        echo '&lt;h1&gt;Hello, World!&lt;/h1&gt;';
+    }
+
+}
+</pre>
+<p>Your application controller classes should always extend the Core52 <code>Controller</code> base class.</p>
+<h2>Default Methods and Controllers</h2>
+<p>Core52 allows you to define a default method to run if the method segment of the URL is omitted. Revising the previous example:</p>
+<pre>&lt;?php
+
+class Controller_Welcome extends Controller {
+
+    # http://your-app-name.dev/welcome
+    public function _default() {
+        echo '&lt;h1&gt;Hello, World!&lt;/h1&gt;';
+    }
+
+}</pre>
+<p>Likewise, you may create a default <em>controller</em> to run if no controller segment is present in the URL. Name this controller <code>_default.php</code>:</p>
+<pre>&lt;?php
+
+class Controller_Default extends Controller {
+
+    # http://your-app-name.dev/
+    public function _default() {
+        echo '&lt;h1&gt;Hello, World!&lt;/h1&gt;';
+    }
+
+}</pre>
+<h2>Subdirectories</h2>
+<p>Core52 supports one or more subdirectories within the main controller directory. Simply add additional segments in your URL matching the directory names, and all the other rules apply. For example:</p>
+<pre>app/
+   -- controllers/
+      -- admin/
+         -- _default.php     http://your-app-name.dev/admin/
+         -- users.php        http://your-app-name.dev/admin/users/
+         -- ...
+</pre>
+<h2>URL Segment Labels</h2>
+<p>Core52&#8242;s segment labeling feature allows you to shift around the normal order of your URL. Instead of this:</p>
+<ul>
+<li>http://your-app-name.dev/contacts/view/1234</li>
+<li>http://your-app-name.dev/contacts/edit/1234</li>
+</ul>
+<p>It may be desirable to present the URL segments in this order:</p>
+<ul>
+<li>http://your-app-name.dev/contacts/1234/view</li>
+<li>http://your-app-name.dev/contacts/1234/edit</li>
+</ul>
+<p>Notice that the last two segments are reversed from the normal order. It is easy to do this:</p>
+<pre>&lt;?php
+
+# apply labels to each URL segment
+Path::Label('/contacts/cid/action');
+
+class Controller_Contacts extends Controller {
+
+    public function cid__edit() {
+        // application logic
+        // retrieve the value of the cid segment using Path::Handle('cid')
+    }
+
+    public function cid__view() {
+        // application logic
+    }
+
+}</pre>
+<p>Notice how the method names are made: segment label + double-underscore + method. The double underscore causes Core52&#8242;s routing to skip the segment labeled <code>cid</code>.</p>
+<h2>Constructors</h2>
+<p>If there is application logic common to every method in the controller, the ideal place for it is in the class constructor. Just be sure to call <code>parent::__construct()</code> at the top of your controller&#8217;s <code>__construct()</code> method.</p>
+<h2>Built-in Functionality</h2>
+<p>The Core52 <code>Controller</code> base class provides several pieces of built-in functionality for your convenience. See the Controller documentation for details. Here is a list of some of the functionality that is provided:</p>
+<ul>
+<li>Optional sanitation of <code>$_GET</code>, <code>$_POST</code>, and <code>$_COOKIE</code> on controller load</li>
+<li>Restricting access based on authentication or specific allowed users</li>
+<li>Automatic <code>Form</code> object loading</li>
+<li>Convenient access to the <code>DatabaseConnection</code> and <code>View</code> objects</li>
+</ul>

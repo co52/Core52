@@ -1,0 +1,50 @@
+<div class="breadcrumb">
+	<div class="breadcrumb breadcrumbs">
+		<div class="breadcrumb-trail">
+			<span class="breadcrumb-title">Browse:</span>
+			<a href="http://core52.com" title="Core52" rel="home" class="trail-begin">Home</a>
+			<span class="sep">/</span>
+			<a href="http://core52.com/docs" title="Documentation">Documentation</a>
+			<span class="sep">/</span>
+			<a href="forms" title="Forms">Forms</a>
+			<span class="sep">/</span>
+			Advanced Form Processing
+		</div>
+	</div>
+</div>
+
+<h1 class="pagetitle">Advanced Form Processing</h1>
+
+<h2>Processing Individual Fields</h2>
+<h3>validate_field($field, $run_filters)</h3>
+<p>Validate a single field. Returns <code>TRUE</code> if successful (note that empty fields are considered valid by default unless the <code>required</code> rule is specified), <code>FALSE</code> if not.</p>
+<h3>render_field($field, $forced_value)</h3>
+<p>Renders a single field. Returns an HTML string. You can force the value of the field by passing a second argument.</p>
+<h3>field_name($field)</h3>
+<p>Returns the human-friendly field name (uses the label setting if present).</p>
+<h3>get_file($field)</h3>
+<p>Returns the <code>$_FILES</code> array for a file upload field.</p>
+<h2>Changing Field Settings</h2>
+<p>The following methods are available for changing field settings on-the-fly in your controller logic.</p>
+<h3>add_filter($field, $filter), add_filters(array $filters)</h3>
+<p>Sets the filter setting for a field or multiple fields.</p>
+<h3>add_rule($field, $rule), add_rules(array $rules)</h3>
+<p>Appends validation rules to a field or multiple fields.</p>
+<h3>set_attributes($field, $options), set_attributes_multi($values)</h3>
+<p>Set the HTML attributes for a field or multiple fields.</p>
+<h3>set_default($field, $default_value), set_defaults(array $defaults)</h3>
+<p>Set the default values for a field or multiple fields.</p>
+<h3>set_field($field, $value)</h3>
+<p>Sets value of field. Overrides submitted form data. Used for replacing the data gathered from the $_POST[] array.  Can be helpful if wanting to change the value of a field before it gets returned from -&gt;get_fields() or -&gt;render().</p>
+<h3>set_label($field, $label), set_labels(array $labels)</h3>
+<p>Set the human-friendly name for a field or multiple fields.</p>
+<h3>set_type($field, $type, array $values = FALSE), set_types(array $types)</h3>
+<p>Set the type for a field or multiple fields.</p>
+<h3>set_value($field, $value), set_values(array $values)</h3>
+<p>Set the allowed values for a field or multiple fields. The value may be an array of items, or it may be a pipe-delimited string which will be converted to a query. The string must be in the following format:</p>
+<pre>table|index column|value column|where clause|order clause
+</pre>
+<h3>clear()</h3>
+<p>Clears all the form fields and associated settings. Use this if you want to re-use a Form object.</p>
+<h3>get_fields()</h3>
+<p>Returns an indexed array of arrays with &#8216;name&#8217; =&gt; &#8216;sanitized value&#8217;.</p>
