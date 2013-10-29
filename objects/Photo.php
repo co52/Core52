@@ -197,6 +197,20 @@
             }
         }
         
+		public function resize_and_crop($new_size) {
+			$size = $this->getSize();
+			
+			// We're only going to resize the size that's smallest
+			if ($size['x'] < $size['y']) {
+				$this->resize($new_size['x'], 'x');
+			} else {
+				$this->resize($new_size['y'], 'y');
+			}
+			
+			$this->crop($new_size['x'], $new_size['y']);
+			
+		}
+		
 		public function crop($x, $y) {
 
 			$cropped_image = imagecreatetruecolor($x, $y);
