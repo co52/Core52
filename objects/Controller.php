@@ -207,7 +207,7 @@ abstract class Controller {
 				# make sure user has permission to access this page
 				if(
 					($this->_allowed_users === NULL || in_array($this->user->pk(), (array) $this->_allowed_users)) &&
-					($this->_allowed_roles === NULL || in_array($this->user->role()->pk(), (array) $this->_allowed_roles))
+					($this->_allowed_roles === NULL || in_array($this->user->role()->pk(), (array) $this->_allowed_roles) || count(array_intersect($this->user->roles(), (array) $this->_allowed_roles)) > 0)
 				) {
 					# user has permission, proceed
 				} else {
