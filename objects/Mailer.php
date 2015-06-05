@@ -200,6 +200,22 @@ class MY_PHPMailer extends PHPMailer {
 			$this->ClearAllRecipients();
 			$this->AddAddress(Config::get('DEV_EMAIL'));
 		}
+		
+		if (Config::get('LOG_EMAIL', FALSE)) {
+
+			# -- Save to the database
+			$query = DatabaseConnection::factory()->start_query('mail_log', 'INSERT')
+				->set_strip_tags(FALSE)
+				->set('subject', $this->Subject)
+				->set('email_body', $this->Body . "\n==Plain Text==\n" . $this->AltBody)
+				->set('to', implode(',', array_keys((array) $this->all_recipients)))
+				->set('user', (Session::logged_in())? Session::user()->pk() : NULL)
+				->set('page_url', PHP_SAPI === 'cli'? $_SERVER['argv'][0] : Router::url())
+				->set('send_after', date('Y-m-d'))
+				->set('debug', serialize($debug))
+					->run();
+
+		}
 		return parent::send();
 	}
 	
