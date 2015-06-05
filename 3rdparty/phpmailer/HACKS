@@ -1,5 +1,0 @@
-Hacks
-=====
-
-Nov 29, 2011 	Changed all private functions to protected, so they could be overridden
-May 1, 2012     Changed all private properties to protected, so they can be accessed in child classes 

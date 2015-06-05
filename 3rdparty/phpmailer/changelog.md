@@ -1,5 +1,11 @@
 # ChangeLog
 
+* Don't switch to quoted-printable for long lines if already using base64
+* Fixed Travis-CI config when run on PHP 7
+* Add address parser for RFC822-format addresses
+
+## Version 5.2.10 (May 4th 2015)
+* Add custom header getter
 * Use `application/javascript` for .js attachments
 * Improve RFC2821 compliance for timelimits, especially for end-of-data
 * Add Azerbaijani translations (Thanks to @mirjalal)
@@ -19,6 +25,19 @@
 * Add Armenian translation (Thanks to Hrayr Grigoryan)
 * Add Slovenian translation (Thanks to Klemen Tušar)
 * More efficient word wrapping
+* Add support for S/MIME signing with additional CA certificate (thanks to @IgitBuh)
+* Fix incorrect MIME structure when using S/MIME signing and isMail() (#372)
+* Improved checks and error messages for missing extensions
+* Store and report SMTP errors more consistently
+* Add MIME multipart preamble for better Outlook compatibility
+* Enable TLS encryption automatically if the server offers it
+* Provide detailed errors when individual recipients fail
+* Report more errors when connecting
+* Add extras classes to composer classmap
+* Expose stream_context_create options via new SMTPOptions property
+* Automatic encoding switch to quoted-printable if message lines are too long
+* Add Korean translation (Thanks to @ChalkPE)
+* Provide a pointer to troubleshooting docs on SMTP connection failure
 
 ## Version 5.2.9 (Sept 25th 2014)
 * **Important: The autoloader is no longer autoloaded by the PHPMailer class**
