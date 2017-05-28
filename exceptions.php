@@ -1,9 +1,9 @@
 <?php
 
-core_set_exception_handler(array('Error', 'handle_exception'));
+core_set_exception_handler(array('ErrorCore', 'handle_exception'));
 
 set_exception_handler('core_handle_exception');
-set_error_handler(array('Error', 'handle_error'), E_ALL ^ E_NOTICE);
+set_error_handler(array('ErrorCore', 'handle_error'), E_ALL ^ E_NOTICE);
 assert_options(ASSERT_ACTIVE, 0);
 ini_set('track_errors', 'On');
 
@@ -19,7 +19,7 @@ class UploadException extends Exception {}
 class FormException extends Exception {}
 
 
-class Error {
+class ErrorCore {
 
 	const DISPLAY_HALT = 1;
 	const DISPLAY_CONTINUE = 2;
@@ -141,7 +141,7 @@ class Error {
 	}
 	
 	
-	public static function handle_exception($exception, $halt = Error::DISPLAY_HALT) {
+	public static function handle_exception($exception, $halt = ErrorCore::DISPLAY_HALT) {
 		
 		try {
 	    	
@@ -175,7 +175,7 @@ class Error {
 					}
 						
 					self::_print_error_footer();
-					Error::report(ob_get_clean(), $exception, $halt);
+					ErrorCore::report(ob_get_clean(), $exception, $halt);
 		    	break;
 	    		
 		    	case 'ErrorException':
@@ -185,11 +185,11 @@ class Error {
 		    		self::_print_error_message($exception);
 					self::_print_error_backtrace($exception);
 		    		self::_print_error_footer();
-		    		Error::report(ob_get_clean(), $exception, $halt);
+		    		ErrorCore::report(ob_get_clean(), $exception, $halt);
 				break;
 		    }
 		    
-		    if($halt == Error::DISPLAY_HALT) core_halt();
+		    if($halt == ErrorCore::DISPLAY_HALT) core_halt();
 		    
 	    }
 	    catch (Exception $e) {
@@ -322,7 +322,7 @@ class Error {
 	}
 	
 	
-	public static function report($html, Exception $e = NULL, $halt = Error::DISPLAY_HALT) {
+	public static function report($html, Exception $e = NULL, $halt = ErrorCore::DISPLAY_HALT) {
 		
 		$email_debug_rcpt = Config::get('EMAIL_DEBUG_RCPT', FALSE);
 		if(!empty($email_debug_rcpt)) {
@@ -368,7 +368,7 @@ class Error {
 				$mailer->send();
 			}
 			
-			if($halt === Error::DISPLAY_HALT || $halt === Error::DISPLAY_CONTINUE) {
+			if($halt === ErrorCore::DISPLAY_HALT || $halt === ErrorCore::DISPLAY_CONTINUE) {
 				if(PHP_SAPI === 'cli' && $e instanceof Exception) {
 					echo str_repeat('=', 80).PHP_EOL;
 					echo $e;
@@ -379,7 +379,7 @@ class Error {
 					echo "\n\nAn unexpected error occurred!\n\n";
 				}
 				
-				if($halt === Error::DISPLAY_HALT) {
+				if($halt === ErrorCore::DISPLAY_HALT) {
 					core_halt();
 				}
 			}
@@ -388,7 +388,7 @@ class Error {
 			
 			$buf_status = ob_get_status(TRUE);
 			
-			if($halt === Error::DISPLAY_HALT || $halt === Error::DISPLAY_CONTINUE) {
+			if($halt === ErrorCore::DISPLAY_HALT || $halt === ErrorCore::DISPLAY_CONTINUE) {
 				if(PHP_SAPI === 'cli' && $e instanceof Exception) {
 					echo str_repeat('=', 80).PHP_EOL;
 					echo $e;
@@ -397,7 +397,7 @@ class Error {
 					echo $html;
 				}
 				
-				if($halt === Error::DISPLAY_HALT) {
+				if($halt === ErrorCore::DISPLAY_HALT) {
 					core_halt();
 				}
 			}

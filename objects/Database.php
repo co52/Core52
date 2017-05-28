@@ -60,7 +60,7 @@ class Database {
 	 */
 	public static function Initialize($group = NULL) {
 		self::$connection = DatabaseConnection::factory($group);
-		self::$initialized = (is_resource(self::connection()));
+		self::$initialized = (is_object(self::connection()));
 		return self::connection();
 	}
 	
@@ -395,7 +395,7 @@ class Database {
 		
 		if(!self::$debug) exit();
 		
-		throw new DatabaseException(mysql_error(self::$connection), mysql_errno(self::$connection));
+		throw new DatabaseException(mysqli_connect_error(), mysqli_connect_errno());
 		
 	}
 	
@@ -854,7 +854,7 @@ abstract class DatabaseQueryHelper {
 				$this->query_instance()->raw_where($where);
 			}
 		}
-		
+
 		return $this->query_instance_run();
 	}
 	
@@ -1234,7 +1234,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 *
 	 */
 	public function __destruct() {
-		@mysql_close($this->connection);
+		@mysqli_close($this->connection);
 	}
 
 
@@ -1245,29 +1245,25 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	public function dsn() {
 		return "mysql://$this->user:$this->password@$this->host/$this->database";
 	}
-	
-	/**
-	 * Connect or re-connect to the database
-	 *
-	 * @return resource
-	 */
+
+    /**
+     * Connect or re-connect to the database
+     *
+     * @param bool $dieOnError
+     * @return bool|mysqli
+     */
 	public function connect($dieOnError = TRUE) {
 		
 		# Close the connection if previously connected
 		if($this->connection) {
-			@mysql_close($this->connection);
+			@mysqli_close($this->connection);
 		}
 	
 		try {
-	
 			# Connect to the database.
-	        if($this->persist == TRUE) {
-			    $this->connection = @mysql_pconnect($this->host, $this->user, $this->password);
-	        } else {
-	        	$this->connection = @mysql_connect($this->host, $this->user, $this->password, TRUE);
-	        }
-		
-		# Catch any exceptions and use handle_connection_error instead.
+            $this->connection = @mysqli_connect($this->host, $this->user, $this->password);
+
+            # Catch any exceptions and use handle_connection_error instead.
 		} catch(Exception $e) {
 			$this->handle_connection_error($dieOnError && DatabaseConnection::$terminate_on_connect_fail);
 		}
@@ -1278,7 +1274,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 
 		# Select the correct database if one was specified.
 		if($this->database != "") {
-			@mysql_select_db($this->database, $this->connection())
+			@mysqli_select_db($this->connection, $this->database)
 				or $this->handle_connection_error($dieOnError && DatabaseConnection::$terminate_on_connect_fail);
 		}
 
@@ -1294,7 +1290,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 * @return boolean
 	 */
 	public function ping() {
-		return (is_resource($this->connection) && @mysql_ping($this->connection));
+		return (is_object($this->connection) && @mysqli_ping($this->connection));
 	}
    
    
@@ -1303,7 +1299,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 * @return integer
 	 */
 	public function thread_id() {
-		return (is_resource($this->connection))? mysql_thread_id($this->connection) : FALSE;
+		return (is_object($this->connection))? mysqli_thread_id($this->connection) : FALSE;
 	}
 	
 	
@@ -1373,16 +1369,14 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	public function insert($table = NULL) {
 		return new DatabaseQuery($this, $table, 'INSERT');
 	}
-	
-	
-	/**
-	 * Returns the MySQLi connection handle
-	 *
-	 * @return resource
-	 * @access public
-	 */
+
+    /**
+     * Returns the MySQLi connection handle
+     *
+     * @return bool|mysqli
+     */
     public function connection() {
-    	if(!is_resource($this->connection)) $this->connect();
+    	if(!is_object($this->connection)) $this->connect();
         return $this->connection;
     }
 	
@@ -1411,7 +1405,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 * Escape a value for safe use in SQL queries
 	 *
 	 * @param string $value
-	 * @param boolean $force
+	 * @param boolean $options
 	 * @return string
 	 */
 	public function escape($value, $options = NULL) {
@@ -1433,7 +1427,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 			}
 	
 			if(($options & DatabaseConnection::ESCAPE_FORCE) != 0 || !get_magic_quotes_gpc() || php_sapi_name() == 'cli') {
-				$value = mysql_real_escape_string($value, $this->connection());
+				$value = mysqli_real_escape_string($this->connection(), $value);
 			}
 	
 			if(($options & DatabaseConnection::ESCAPE_QUOTE) != 0 && !is_integer($value)) {
@@ -1482,7 +1476,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		
 		# Execute and return the result.
 		$start = microtime(TRUE);
-		$result = mysql_query($sql, $this->connection());
+		$result = mysqli_query($this->connection(), $sql);
 		
 		if($result === FALSE) {
 
@@ -1492,7 +1486,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 			# Reconnect and re-try the query
 			if(in_array($this->error_code(), array(2006, 2013))) {
 				$this->connect();
-				$result = mysql_query($sql, $this->connection());
+				$result = mysqli_query($this->connection(), $sql);
 				if($result === FALSE && $this->report_errors) {
 					$this->handle_error();
 					return FALSE;
@@ -1671,7 +1665,7 @@ Recent Queries:
 	 * @access public
 	 */
 	public function error_code() {
-		return ($this->connection)? @mysql_errno($this->connection) : @mysql_errno();
+		return @mysqli_connect_errno();
 	}
 	
 	
@@ -1682,7 +1676,7 @@ Recent Queries:
 	 * @access public
 	 */
 	public function error_msg() {
-		return ($this->connection)? @mysql_error($this->connection) : @mysql_error();
+		return @mysqli_connect_error();
 	}
 	
 }
@@ -2527,12 +2521,12 @@ class DatabaseResult implements DatabaseResultInterface {
 	 * Construct a DatabaseResult object
 	 *
 	 * @param DatabaseConnection $connection
-	 * @param resource $qh
+	 * @param mysqli_result $qh
 	 * @param string $sql
 	 * @param float $time
 	 */
 	public function __construct(DatabaseConnection $connection, $qh, $sql = NULL, $time = NULL) {
-		
+
 		$this->connection = $connection;
 		$this->qh = $qh;
 		$this->query_time = $time;
@@ -2540,9 +2534,9 @@ class DatabaseResult implements DatabaseResultInterface {
 		$this->statement = (string) $sql;
 		
 		if($qh !== FALSE) {
-			$this->num_rows = @mysql_num_rows($this->qh);
-			$this->affected_rows = @mysql_affected_rows($connection->connection());
-			$this->insert_id = @mysql_insert_id($connection->connection());
+			$this->num_rows = @mysqli_num_rows($this->qh);
+			$this->affected_rows = @mysqli_affected_rows($connection->connection());
+			$this->insert_id = @mysqli_insert_id($connection->connection());
 		}
 	
 	}
@@ -2561,7 +2555,7 @@ class DatabaseResult implements DatabaseResultInterface {
 		
 			$this->result = array();
 
-			while($row = mysql_fetch_object($this->qh)) {
+			while($row = mysqli_fetch_object($this->qh)) {
 				$this->result[] = $row;
 			}
 			
@@ -2827,7 +2821,7 @@ class DatabaseResult implements DatabaseResultInterface {
 				return $this->row();
 			}
 	
-			$row = mysql_fetch_object($this->qh);
+			$row = mysqli_fetch_object($this->qh);
 			if($row !== FALSE) {
 				$this->result[] = $row;
 			}

@@ -39,7 +39,7 @@ function core_execute() {
 		
 		# detect output
 		if(!Router::is_ajax() && !headers_sent() && strlen(trim($output)) == 0) {
-			Error::show_404();
+			ErrorCore::show_404();
 		} else {
 			echo $output;
 		}
@@ -209,14 +209,14 @@ function core_unset_exception_handler($callback = NULL) {
 	return TRUE;
 }
 
-function core_handle_exception(Exception $e) {
+function core_handle_exception($e) {
 	foreach((array) Config::get('exception_handler', FALSE) as $callback) {
 		if(is_callable($callback)) {
 			call_user_func($callback, $e);
 			core_halt();
 		}
 	}
-	Error::handle_exception($e);
+	ErrorCore::handle_exception($e);
 }
 
 function core_log($msg, $logfilename = 'application.log', $logfilepath = 'logs/', $br = "\n") {
