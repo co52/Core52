@@ -1,0 +1,7 @@
+{
+    "name": "co52/core52",
+    "description": "Core52: Rapid development MVC Framework for PHP - Official Repository",
+    "type": "framework",
+    "license": "MIT",
+    "require": {}
+}
