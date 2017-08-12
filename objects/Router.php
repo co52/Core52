@@ -152,7 +152,7 @@ class Router {
 		# initialize variables
 		self::$path = $path;
 		self::$domain = array_reverse(explode('.', $host));
-		self::$server = $host;
+		self::$server = $_SERVER['HTTP_HOST'];
 		self::$referer = $_SERVER['HTTP_REFERER'];
 		self::$pointer = 0;
 		
