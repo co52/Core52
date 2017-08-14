@@ -1,13 +1,13 @@
 <?php
 
 if(defined('ENABLE_LEGACY_SESSIONS')) {
-	
+
 	require_once dirname(__FILE__).'/Session_Legacy.php';
-	
+
 } else {
 
 	AutoClassLoader::Unregister();
-	
+
 	// forward compatible with PHP 5.4
 	if(!interface_exists('SessionHandlerInterface')) {
 		interface SessionHandlerInterface {
@@ -19,28 +19,28 @@ if(defined('ENABLE_LEGACY_SESSIONS')) {
 			public function write($sessionid, $sessiondata);
 		}
 	}
-	
+
 	if(!class_exists('SessionHandler')) {
 		class SessionHandler implements SessionHandlerInterface {
-			
+
 			protected $sessionid;
 			protected $sess_save_path;
-			
+
 			public function open($save_path, $sessionid) {
 			    $this->sess_save_path = $save_path;
 			    $this->sessionid = $sessionid;
 			    return TRUE;
 			}
-			
+
 			public function close() {
 			    return TRUE;
 			}
-			
+
 			public function read($sessionid) {
 			    $sess_file = "$this->sess_save_path/sess_$sessionid";
 			    return (string) @file_get_contents($sess_file);
 			}
-			  
+
 			public function write($sessionid, $sess_data) {
 			    $sess_file = "$this->sess_save_path/sess_$sessionid";
 			    if($fp = @fopen($sess_file, "w")) {
@@ -51,12 +51,12 @@ if(defined('ENABLE_LEGACY_SESSIONS')) {
 			    	return FALSE;
 			    }
 			}
-			
+
 			public function destroy($sessionid) {
 			    $sess_file = "$this->sess_save_path/sess_$sessionid";
 			    return @unlink($sess_file);
 			}
-			
+
 			public function gc($maxlifetime) {
 			    foreach(glob("$this->sess_save_path/sess_*") as $filename) {
 			    	if(filemtime($filename) + $maxlifetime < time()) {
@@ -67,10 +67,10 @@ if(defined('ENABLE_LEGACY_SESSIONS')) {
 			}
 		}
 	}
-	
+
 	AutoClassLoader::Register();
-	
-	
+
+
 	/**
 	 * PHP session decode function
 	 *
@@ -168,8 +168,8 @@ if(defined('ENABLE_LEGACY_SESSIONS')) {
 	     	throw new Exception("Could not decode session data: $str");
 	     }
 	}
-	
-	
+
+
 	function session_array_to_string(array $array) {
 		$bk = $_SESSION;
 		$_SESSION = $array;
@@ -177,8 +177,8 @@ if(defined('ENABLE_LEGACY_SESSIONS')) {
 		$_SESSION = $bk;
 		return $string;
 	}
-	
-	
+
+
 	/**
 	 * A MySQL session handler, patterned after the PHP 5.4 session handler class
 	 *
@@ -187,7 +187,7 @@ if(defined('ENABLE_LEGACY_SESSIONS')) {
 	 * @version 1.0
 	 */
 	class MysqlSessionHandler implements SessionHandlerInterface {
-		
+
 		protected static $initialized = FALSE;
 		protected static $check_sessions_table = TRUE;
 		protected static $session_table_create_sql = "
@@ -203,66 +203,66 @@ CREATE TABLE `sessions` (
 	INDEX `ndx_sessions_users` USING BTREE (`user`),
 	INDEX `ndx_sessions_timestamp` USING BTREE (`timestamp`)
 ) ENGINE=InnoDB;";
-		
+
 		/**
 		 * @var array Current session database row
 		 */
 		protected $session;
-		
+
 		public function __construct() {
 			if(!self::$initialized) {
 				self::$initialized = TRUE;
-				
+
 				// Create the sessions table if it doesn't exist
 				if(self::$check_sessions_table) {
 					$this->create_session_table();
 				}
 			}
 		}
-		
+
 		public function create_session_table() {
 			$table_missing = database()->execute("SHOW TABLES LIKE 'sessions'")->null_set();
 		    if($table_missing) {
 		    	database()->execute(self::$session_table_create_sql);
 		    }
 		}
-		
+
 		public function close() {
 			return TRUE;
 		}
-		
+
 		public function destroy($sessionid) {
 			database()->delete('sessions', array(
 				'key' => $sessionid,
 			));
 			return TRUE;
 		}
-		
+
 		public function gc($maxlifetime) {
 			$timestamp = database()->escape(format_date_mysql(time() - $maxlifetime));
 			database()->delete('sessions', 'timestamp <= '.$timestamp);
 			return TRUE;
 		}
-		
+
 		public function open($save_path, $sessionid) {
 			return TRUE;
 		}
-		
+
 		public function read($sessionid) {
 			$result = database()->findById('sessions', $sessionid, 'key');
 			$this->session = $result->row_array();
 			return (string) $this->session['_data'];
 		}
-		
+
 		public function write($sessionid, $sessiondata) {
-			
+
 			// find the hit number for this request
 			$this->read($sessionid); // loads the previous copy of the session record into $this->session
 			$hit = $this->session['hits'] + 1;
-			
+
 			// unserialize the session data so we can read it
 			$data = session_string_to_array($sessiondata);
-			
+
 			// store the session data
 			database()->replace('sessions', array(
 				'key'     => $sessionid,
@@ -272,28 +272,28 @@ CREATE TABLE `sessions` (
 				'hits'    => $hit,
 				'user'    => $data['user'],
 			));
-	
+
 			return TRUE;
 		}
-		
+
 		public function update_id($old_sessionid, $new_sessionid) {
-				
+
 			// Delete the new session, if it exists
 			$this->destroy($new_sessionid);
-			
+
 			// Update the old session ID to the new session ID
 			database()->update('sessions', array(
 				'key' => $new_sessionid,
 			), array(
 				'key' => $old_sessionid,
 			));
-			
+
 			return TRUE;
 		}
-		
+
 	}
-	
-	
+
+
 	/**
 	 * Core52 Session class
 	 *
@@ -302,29 +302,29 @@ CREATE TABLE `sessions` (
 	 * @version 1.4
 	 **/
 	class Session {
-	
+
 		public static $variable = 'sid'; // session cookie name
 		public static $sid; // session id
-		
+
 		const Token_Variable = 'sid_token'; // anti-CSRF token name
 		protected static $check_xsrf = FALSE;
 		protected static $salt;
 		protected static $session_storage = 'MysqlSessionHandler';
-		
+
 		/**
 		 * Login object
 		 *
 		 * @var Login
 		 */
 		protected static $login;
-		
+
 		/**
 		 * SessionObject object
 		 *
 		 * @var SessionObject
 		 */
 		protected static $session;
-		
+
 		/**
 		 * Configure and enable sessions
 		 *
@@ -342,24 +342,24 @@ CREATE TABLE `sessions` (
 		 * @return SessionObject
 		 */
 		public static function Initialize($cookie_uri = FALSE, $salt = NULL, $login_controller = '/login', $expiration_threshold = '+4 hour', $user_class = 'User', $prevent_xsrf = FALSE, $stronger_tokens = TRUE, $secure_cookies = TRUE, $session_handler = 'MysqlSessionHandler', SessionObject $session_object = NULL, Login $login_object = NULL) {
-			
+
 			// Already initialized?
 			if(self::$session) {
 				return self::$session;
 			}
-			
+
 			// Extract array data as individual vars
 			if(is_array($cookie_uri)) {
 				extract($cookie_uri);
 			}
-			
+
 			// If 'cookie_uri' wasn't set in the array, then set it to the default value
 			if(is_array($cookie_uri)) {
 				$cookie_uri = FALSE;
 			}
-			
+
 			self::$salt = $salt;
-			
+
 			// Calculate the session expiration time in seconds
 			if(!empty($expiration_threshold) && !is_numeric($expiration_threshold) && strtotime($expiration_threshold) !== FALSE) {
 				$lifetime = time() - strtotime($expiration_threshold);
@@ -368,7 +368,7 @@ CREATE TABLE `sessions` (
 			} else {
 				$lifetime = time() - strtotime('+4 hour');
 			}
-			
+
 			// Start the session
 			if($session_object instanceof SessionObject) {
 				self::$session = $session_object;
@@ -383,7 +383,7 @@ CREATE TABLE `sessions` (
 			}
 			self::$variable &= self::$session->name;
 			self::$sid &= self::$session->sid;
-			
+
 			// Load logged in user
 			if($login_object instanceof Login) {
 				self::$login = $login_object;
@@ -391,16 +391,16 @@ CREATE TABLE `sessions` (
 				self::$login = new Login($user_class);
 				self::$login->set_login_controller($login_controller);
 			}
-			
+
 			if($prevent_xsrf == TRUE) {
 				self::$check_xsrf = TRUE;
 				self::check_xsrf_token();
 				self::set_xsrf_token(FALSE);
 			}
-			
+
 			return self::$session;
 		}
-	
+
 		/**
 		 * Get the singleton SessionObject instance
 		 *
@@ -415,7 +415,7 @@ CREATE TABLE `sessions` (
 				return FALSE;
 			}
 		}
-		
+
 		/**
 		 * Set an XSRF token (nonce)
 		 *
@@ -423,20 +423,20 @@ CREATE TABLE `sessions` (
 		 * @author Alex King
 		 **/
 		public static function set_xsrf_token($force = FALSE) {
-			
+
 			// Only proceed if check_xsrf is on, or there is a force argument.
 			if($force) {
 				self::$check_xsrf = TRUE;
 			} elseif(!self::$check_xsrf) {
 				return;
 			}
-					
+
 			// If there is no nonce in the session, generate one
 			if(empty($_SESSION[self::Token_Variable])) {
 				$_SESSION[self::Token_Variable] = hash('sha256', uniqid(rand(), TRUE));
 			}
 		}
-		
+
 		/**
 		 * Check POST requests for a valid XSRF token (nonce)
 		 *
@@ -447,7 +447,7 @@ CREATE TABLE `sessions` (
 				Session::check_xsrf_token_string($_POST[self::Token_Variable]);
 			}
 		}
-		
+
 		/**
 		 * Check a token against the one stored in the session
 		 *
@@ -459,7 +459,7 @@ CREATE TABLE `sessions` (
 				throw new XSRFSecurityException('Token mismatch, possible cross-site request forgery');
 			}
 		}
-	
+
 		/**
 		 * Get the XSRF token (nonce) value
 		 *
@@ -469,16 +469,16 @@ CREATE TABLE `sessions` (
 		public static function get_xsrf_token() {
 			return (string) $_SESSION[self::Token_Variable];
 		}
-	
+
 		/**
 		 * Output session debug information
 		 */
 		public static function debug() {
-	
+
 			$user = print_r(self::user(), TRUE);
 			$data = print_r($_SESSION, TRUE);
 			$sid = session_id();
-			
+
 			echo <<<DEBUG
 <pre style="width:70%; border:1px solid black; background:#eee; padding:50px; margin:50px auto; clear:both; position:relative; z-index:100000;">
 <b>Session debugging:</b>
@@ -489,9 +489,9 @@ User=$user
 Data=$data
 </pre>
 DEBUG;
-			
+
 		}
-	
+
 		/**
 		 * Destroys the current session and starts a new one
 		 */
@@ -502,7 +502,7 @@ DEBUG;
 			self::$session->reset();
 			self::set_xsrf_token(FALSE);
 		}
-	
+
 		/**
 		 * Flashdata getter/setter
 		 *
@@ -516,7 +516,7 @@ DEBUG;
 			}
 			return self::$session->flashdata($var, $value);
 		}
-		
+
 		/**
 		 * Unset a flashdata var
 		 *
@@ -528,7 +528,7 @@ DEBUG;
 			}
 			return self::$session->unset_flashdata($var);
 		}
-		
+
 		/**
 		 * Session data getter/setter
 		 *
@@ -537,28 +537,28 @@ DEBUG;
 		 * @return unknown_type
 		 */
 		public static function data($var = NULL, $value = NULL) {
-			
+
 			// return all session data
 			if($var === NULL) {
 				return $_SESSION;
 			}
-			
+
 			// set multiple session vars
 			elseif(is_array($var) && $value === NULL) {
 				$_SESSION = array_merge($_SESSION, $var);
 			}
-			
+
 			// return a specific var
 			elseif($value === NULL) {
 				return $_SESSION[$var];
 			}
-			
+
 			// set a single var
 			else {
 				$_SESSION[$var] = $value;
 			}
 		}
-		
+
 		/**
 		 * Unset a session data var
 		 *
@@ -569,7 +569,7 @@ DEBUG;
 			unset($_SESSION[$var]);
 			return $val;
 		}
-		
+
 		/**
 		 * Deprecated; use the Login class instead
 		 *
@@ -578,24 +578,24 @@ DEBUG;
 		 * @return Model
 		 */
 		public static function user($id = FALSE, $class = FALSE) {
-			
+
 			if(!self::$login instanceof Login) {
 				throw new Exception('Session not initialized, please call Session::Initialize() before calling this method');
 			}
-			
+
 			if(!$class) $class = self::$login->user_class;
-			
+
 			# log out a user
 			if($id === 'end') {
 				self::$login->logout();
 				return TRUE;
 			}
-			
+
 			# log in a user
 			elseif($id && self::$login->login($id, $class)) {
 				return self::$login->user();
 			}
-			
+
 			# no data passed; not logged in
 			elseif(!$id && !self::$login->login()) {
 				try {
@@ -604,13 +604,13 @@ DEBUG;
 					return (object) array();
 				}
 			}
-			
+
 			# no data passed; logged in
 			else {
 				return self::$login->login();
 			}
 		}
-		
+
 		/**
 		 * Deprecated; use the Login class instead
 		 *
@@ -623,7 +623,7 @@ DEBUG;
 				return self::$login->is_logged_in();
 			}
 		}
-		
+
 		/**
 		 * Deprecated, use Login::redir() instead
 		 *
@@ -633,7 +633,7 @@ DEBUG;
 		public static function login_redir($url = FALSE, $login_page = FALSE) {
 			Login::redir($url, $login_page);
 		}
-	
+
 		/**
 		 * Change the session ID (use to prevent session fixation)
 		 */
@@ -643,7 +643,7 @@ DEBUG;
 			}
 			self::$session->regenerate_id();
 		}
-	
+
 		/**
 		 * Deprecated, use Login::check_redir() instead
 		 *
@@ -655,7 +655,7 @@ DEBUG;
 			}
 			self::$login->check_redir();
 		}
-		
+
 		/**
 		 * Deprecated, use Login::post_redir() instead
 		 *
@@ -664,7 +664,7 @@ DEBUG;
 		public static function post_login_redir($url = '/') {
 			Login::post_redir($url);
 		}
-		
+
 		/**
 		 * Deprecated, use the Password class instead
 		 *
@@ -677,9 +677,9 @@ DEBUG;
 				throw new Exception('Session not initialized, please call Session::Initialize() before calling this method');
 			}
 			$method = ($force_stronger_tokens || self::$session->stronger_tokens)? 'sha256' : 'md5';
-			return Password::hash(self::$salt, (string) $password, $method);
+			return (new Password)->hash(self::$salt, (string) $password, $method);
 		}
-		
+
 		/**
 		 * Deprecated, use the Password class instead
 		 *
@@ -690,10 +690,10 @@ DEBUG;
 		public static function random_password($length = 8, $chars = '1234567890qwrypasdfghnz') {
 			return (string) new Password($length, $chars);
 		}
-	
+
 	}
-	
-	
+
+
 	/**
 	 * Wrapper object for PHP sessions
 	 *
@@ -703,21 +703,21 @@ DEBUG;
 	 *
 	 */
 	class SessionObject {
-		
+
 		public $name = 'sid'; // session cookie name
 		public $sid = false; // session id
 		public $domain = FALSE;
 		public $stronger_tokens = TRUE;
 		public $secure_cookies = TRUE;
 		public $lifetime = 14400; // 4 hours
-		
+
 		/**
 		 * Session handler object
 		 *
 		 * @var SessionHandlerInterface
 		 */
 		protected $handler;
-		
+
 		/**
 		 * Configure the session
 		 *
@@ -730,37 +730,37 @@ DEBUG;
 		 *      auto_start: If TRUE, starts the session immediately (defaults to TRUE)
 		 */
 		public function __construct(SessionHandlerInterface $handler, array $settings = array()) {
-			
+
 			$this->handler = $handler;
-			
+
 			// make the session cookie name specific to this domain
 			$this->name .= '_'.md5(strtolower(Router::domain('', FALSE)));
-			
+
 			if(isset($settings['stronger_tokens'])) {
 				$this->stronger_tokens = (bool) $settings['stronger_tokens'];
 			}
-			
+
 			if(isset($settings['secure_cookies'])) {
 				$this->secure_cookies =  (bool) $settings['secure_cookies'];
 			}
-			
+
 			if(isset($settings['domain']) && !empty($settings['domain'])) {
 				$this->domain = $settings['domain'];
 			} else {
 				$this->domain = Router::domain('.', FALSE);
 			}
-			
+
 			if(isset($settings['lifetime'])) {
 				$this->lifetime = (int) $settings['lifetime'];
 			}
-			
+
 			// set the session hash generation method
 			if($this->stronger_tokens) {
 				ini_set('session.hash_function', 'sha256');
 			} else {
 				ini_set('session.hash_function', 0); // md5
 			}
-			
+
 			// configure the session cookie expiration and security settings
 			session_name($this->name); // cookie name is namespaced to the domain (see above)
 			session_set_cookie_params(
@@ -770,13 +770,13 @@ DEBUG;
 				(Router::protocol() == 'https' && $this->secure_cookies), // transmit only over https
 				(Router::protocol() == 'http' && $this->secure_cookies)   // set the HTTPONLY flag if supported
 			);
-			
+
 			// start the session
 			if(!isset($settings['auto_start']) || $settings['auto_start']) {
 				$this->start();
 			}
 		}
-		
+
 		/**
 		 * Starts the session
 		 */
@@ -794,7 +794,7 @@ DEBUG;
 			$this->sid = session_id();
 			$this->_update_flashdata();
 		}
-		
+
 		protected function _update_flashdata() {
 			if(is_array($_SESSION['flashdata'])) {
 				foreach($_SESSION['flashdata'] as $k => $v) {
@@ -809,16 +809,16 @@ DEBUG;
 				}
 			}
 		}
-		
-	
+
+
 		/**
 		 * Output session debug information
 		 */
 		public function debug() {
-	
+
 			$data = print_r($_SESSION, TRUE);
 			$sid = session_id();
-			
+
 			echo <<<DEBUG
 <pre style="width:70%; border:1px solid black; background:#eee; padding:50px; margin:50px auto; clear:both; position:relative; z-index:100000;">
 <b>Session debugging:</b>
@@ -827,9 +827,9 @@ SID=$sid
 Data=$data
 </pre>
 DEBUG;
-			
+
 		}
-	
+
 		/**
 		 * Destroys the current session and starts a new one
 		 */
@@ -839,7 +839,7 @@ DEBUG;
 			session_write_close();
 			$this->sid = session_id();
 		}
-	
+
 		/**
 		 * Flashdata getter/setter
 		 *
@@ -848,7 +848,7 @@ DEBUG;
 		 * @return unknown_type
 		 */
 		public function flashdata($var = NULL, $value = NULL) {
-			
+
 			// flashdata is stored as normal session data, with metadata about the
 			// flashdata status stored in $_SESSION['flashdata']:
 			//
@@ -856,7 +856,7 @@ DEBUG;
 			//     $_SESSION['foo'] = 'bar';
 			//     $_SESSION['flashdata']['foo'] = 'status';
 			//   where 'status' is either 'new' or 'old'.
-			
+
 			// return all flashdata vars
 			if($var === NULL) {
 				$flashdata = array();
@@ -865,19 +865,19 @@ DEBUG;
 				}
 				return $flashdata;
 			}
-			
+
 			// set multiple flashdata vars
 			elseif(is_array($var) && $value === NULL) {
 				foreach($var as $k => $v) {
 					$this->flashdata($k, $v);
 				}
 			}
-	
+
 			// return a specific flashdata var
 			elseif($value === NULL) {
 				return (isset($_SESSION['flashdata'][$var]))? $_SESSION[$var] : NULL;
 			}
-			
+
 			// set a single flashdata var
 			else {
 				// detect collisons
@@ -889,7 +889,7 @@ DEBUG;
 				}
 			}
 		}
-		
+
 		/**
 		 * Unset a flashdata var
 		 *
@@ -906,7 +906,7 @@ DEBUG;
 				return NULL;
 			}
 		}
-		
+
 		/**
 		 * PHP5 getters and setters
 		 */
@@ -922,7 +922,7 @@ DEBUG;
 		public function __set($var, $value) {
 			$_SESSION[$var] = $value;
 		}
-		
+
 		/**
 		 * Change the session ID (use to prevent session fixation)
 		 */
@@ -937,7 +937,7 @@ DEBUG;
 			}
 			$this->sid = session_id();
 		}
-	
+
 	}
 
 }
