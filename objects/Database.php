@@ -2516,7 +2516,16 @@ class DatabaseResult implements DatabaseResultInterface {
 	 * @access private
 	 */
 	private $table = FALSE;
-	
+
+
+	/**
+	 * History of all queries
+	 *
+	 * @var array
+	 * @access private
+	 */
+	public static $history = [];
+
 	/**
 	 * Construct a DatabaseResult object
 	 *
@@ -2532,16 +2541,18 @@ class DatabaseResult implements DatabaseResultInterface {
 		$this->query_time = $time;
 		$this->query = $sql;
 		$this->statement = (string) $sql;
-		
+
+		self::$history[] = [$sql, $time];
+
 		if($qh !== FALSE) {
 			$this->num_rows = @mysqli_num_rows($this->qh);
 			$this->affected_rows = @mysqli_affected_rows($connection->connection());
 			$this->insert_id = @mysqli_insert_id($connection->connection());
 		}
-	
+
 	}
 
-	
+
 	/**
 	 * Return the query results as an array of rows in object format
 	 *
