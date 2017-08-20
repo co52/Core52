@@ -9,12 +9,15 @@
  * @return 	string	text safe to send to the browser
  * @author 	Alex King
  **/
-function e($html, $encoding = 'UTF-8') {
-	
-	# convert encoding and ensure consistency
-	$html = mb_convert_encoding((string) $html, $encoding);
-	
-	return htmlspecialchars($html, ENT_QUOTES, $encoding);
+
+if (! function_exists('e')) {
+	function e($html, $encoding = 'UTF-8') {
+
+		# convert encoding and ensure consistency
+		$html = mb_convert_encoding((string) $html, $encoding);
+
+		return htmlspecialchars($html, ENT_QUOTES, $encoding);
+	}
 }
 
 function format_date($dt = NULL, $fmt = 'n/d/y g:ia T', $hide_null_dates = FALSE) {
