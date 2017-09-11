@@ -134,7 +134,7 @@ class Model_Controller extends Admin_Controller {
 	}
 	
 	
-	protected function output() {
+	protected function output($return = FALSE) {
 		$this->view->Global_Data('model', $this->_model);
 		parent::output();
 	}

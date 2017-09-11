@@ -422,7 +422,7 @@ class Form {
 			
 			# run the query
 			$result = $query->run(FALSE); // don't cache
-			while($data = mysql_fetch_array($result->qh, MYSQL_NUM)) {
+			while($data = mysqli_fetch_array($result->qh, MYSQLI_NUM)) {
 				if(count($data) > 2) {
 					throw new InvalidArgumentException("More than two columns were selected for the $field values, please check your shorthand syntax");
 				}
