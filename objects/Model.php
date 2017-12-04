@@ -292,7 +292,6 @@ abstract class Model {
 	
 	public function delete() {
 		$this->db()->start_query($this->_table, 'DELETE')->where($this->_pk, $this->pk())->run();
-		unset($this);
 		return NULL;
 	}
 	
