@@ -52,7 +52,7 @@ class ErrorCore {
 	}
 	
 	
-	public static function _print_error_backtrace(Exception $exception) {
+	public static function _print_error_backtrace($exception) {
 
 ?>
 		<h2>Backtrace:</h2>
@@ -322,7 +322,7 @@ class ErrorCore {
 	}
 	
 	
-	public static function report($html, Exception $e = NULL, $halt = ErrorCore::DISPLAY_HALT) {
+	public static function report($html, $e = NULL, $halt = ErrorCore::DISPLAY_HALT) {
 		
 		$email_debug_rcpt = Config::get('EMAIL_DEBUG_RCPT', FALSE);
 		if(!empty($email_debug_rcpt)) {
