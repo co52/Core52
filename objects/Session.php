@@ -382,7 +382,7 @@ CREATE TABLE `sessions` (
 				));
 			}
 			self::$variable &= self::$session->name;
-			self::$sid &= self::$session->sid;
+			self::$sid = self::$session->sid;
 
 			// Load logged in user
 			if($login_object instanceof Login) {
