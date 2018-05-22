@@ -2344,7 +2344,7 @@ class DatabaseQuery implements DatabaseQueryInterface {
 	 */
 	public function limit($limit, $offset = NULL) {
 
-		$this->limit = ($offset === NULL)? $limit : "$limit, $offset";
+		$this->limit = ($offset === NULL)? $limit : "$offset, $limit";
 		return $this;
 	}
 	
