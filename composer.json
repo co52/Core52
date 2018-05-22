@@ -3,5 +3,11 @@
     "description": "Core52: Rapid development MVC Framework for PHP - Official Repository",
     "type": "framework",
     "license": "MIT",
-    "require": {}
+    "require": {},
+    "require-dev": {
+        "filp/whoops": "^2.1"
+    },
+    "suggest": {
+        "sentry/sentry": "Report errors to Sentry.io"
+    }
 }
