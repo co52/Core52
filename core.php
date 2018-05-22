@@ -18,13 +18,6 @@ function core_execute() {
 			exit;
 		}
 		
-		# version headers
-		if(!headers_sent()) {
-			$core_rev = svn_get_version(PATH_CORE, FALSE);
-			$app_rev = svn_get_version(PATH_APP, FALSE);
-			@header("X-Core52-Version: core=$core_rev; app=$app_rev");
-		}
-		
 		# run the controller
 		ob_start();
 		if(defined('ENABLE_LEGACY_ROUTING')) {
