@@ -392,11 +392,8 @@ class Database {
 	 *
 	 */
 	public static function error() {
-		
 		if(!self::$debug) exit();
-		
-		throw new DatabaseException(mysqli_connect_error(), mysqli_connect_errno());
-		
+		throw DatabaseException::factory(self::$connection);
 	}
 	
 	
@@ -637,8 +634,6 @@ class Database {
 		
 }
 
-
-
 class DatabaseCache {
 
 	private static $cache = array();
@@ -744,9 +739,6 @@ class DatabaseCache {
 
 
 }
-
-
-
 
 abstract class DatabaseQueryHelper {
 	
@@ -1163,9 +1155,6 @@ abstract class DatabaseQueryHelper {
 	
 }
 
-
-
-
 class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnectionInterface {
 
 	public $name;
@@ -1516,77 +1505,13 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
     }
 	
 	
-    /**
-     * Parse the error message template
-     *
-     * @return string
-     */
-	public function get_errors($echo = TRUE) {
-		$output = ob_get_clean();
-		ob_start();
-		if(PHP_SAPI !== 'cli') {
-?>
-		
-		<h1>Database Error</h1>
-		
-		<p>We're sorry, but the system has encountered an error. We have notified technical support with the details of this error and they are working to get the problem resolved. Please try again later.</p>
-
-		<h2>MySQL Error <?=$this->error_code();?></h2>
-		
-		<h3>Description</h3>
-		<pre><?=$this->error_msg();?></pre>
-		
-		<h3>Query</h3>
-		<pre><?=$this->last_query();?></pre>
-
-		<h2>Most Recent Queries:</h2>
-<ol>
-<?php
-	foreach($this->query_history as $q) {
-		echo "<li><b>$q->file[$q->line]:</b>\n<pre>$q->query</pre></li>\n";
-	}
-?>
-</ol>
-		
-		
-<?php
-		} else {
-?>
-
-
-MySQL Error <?=$this->error_code();?>
-
---------------------
-<?=$this->error_msg();?>
-
-
-Query:
---------
-<?=$this->last_query();?>
-
-
-Recent Queries:
------------------
-<?php
-			foreach($this->query_history as $q) {
-				echo "$q->file[$q->line]:\n$q->query\n--\n";
-			}
-			echo "\n";
-		}
-		$errors = ob_get_clean();
-		echo $output;
-		if($echo) echo $errors;
-		return $errors;
-	}
-	
-	
 	/**
 	 * Database error handler
 	 *
 	 * @param boolean $exit
 	 */
 	public function handle_error($exit = TRUE) {
-		throw new DatabaseException($this->get_errors(FALSE), $this->error_code());
+		throw DatabaseException::factory($this);
 		if($exit) die;
 	}
 
@@ -1599,7 +1524,7 @@ Recent Queries:
 	 * @param boolean $exit
 	 */
 	public function handle_connection_error($exit = TRUE) {
-		throw new DatabaseConnectionException($this->get_errors(FALSE));
+		throw DatabaseConnectionException::factory($this);
 		if($exit) die;
 	}
 	
@@ -1680,9 +1605,6 @@ Recent Queries:
 	}
 	
 }
-
-
-
 
 class DatabaseQuery implements DatabaseQueryInterface {
 	
@@ -2420,8 +2342,6 @@ class DatabaseQuery implements DatabaseQueryInterface {
 	
 	
 }
-
-
 	
 class DatabaseResult implements DatabaseResultInterface {
 	
@@ -2987,9 +2907,6 @@ class DatabaseResult implements DatabaseResultInterface {
 }
 
 
-
-
-
 interface DatabaseConnectionInterface{
 	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE);
 	public function __destruct();
@@ -3001,7 +2918,6 @@ interface DatabaseConnectionInterface{
 	public function error_msg();
 	public function handle_error($exit = TRUE);
 }
-
 
 interface DatabaseQueryInterface{
 	public function __construct(DatabaseConnection $connection, $table = NULL, $statement = NULL);
@@ -3021,7 +2937,6 @@ interface DatabaseQueryInterface{
 	public function run();
 }
 
-
 interface DatabaseResultInterface{
 	public function __construct(DatabaseConnection $connection, $qh, $sql = NULL, $time = NULL);
 	public function result();
@@ -3036,7 +2951,6 @@ interface DatabaseResultInterface{
 	public function null_set();
 	public function insert_id();
 }
-
 
 
 /**
