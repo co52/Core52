@@ -117,8 +117,7 @@
 		'object',
 		'email',
 		'json',
-		'ci/text_helper',
-		'svn',
+		'ci/text_helper'
 	), TRUE);
 	
 	# Load additional (custom) helpers
