@@ -1745,11 +1745,11 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				if(count($this->where) > 0) {
 					$clauses[] = 'WHERE '. implode(' AND ', $this->where);
 				}
-				
-				if(count($this->order) > 0) {
-					$clauses[] = 'ORDER BY '.implode(', ', $this->order);
-				}
-				
+
+                if(count($this->order) > 0) {
+                    $clauses[] = $this->build_sort_clause($this->order, $this->order_direction);
+                }
+
 				if(strlen($this->limit) > 0) {
 					$clauses[] = 'LIMIT '.$this->limit;
 				}
@@ -1766,11 +1766,11 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				if(count($this->where) > 0) {
 					$clauses[] = 'WHERE '. implode(' AND ', $this->where);
 				}
-				
-				if(count($this->order) > 0) {
-					$clauses[] = 'ORDER BY '.implode(', ', $this->order);
-				}
-				
+
+                if(count($this->order) > 0) {
+                    $clauses[] = $this->build_sort_clause($this->order, $this->order_direction);
+                }
+
 				if(strlen($this->limit) > 0) {
 					$clauses[] = 'LIMIT '.$this->limit;
 				}
@@ -1829,11 +1829,7 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				
 				# select order
 				if(count($this->order) > 0) {
-					$order_fragments = array();
-					foreach($this->escape_col_names($this->order) as $col) {
-						$order_fragments[] = (preg_match('/ (ASC|DESC|RAND\(\))$/i', $col))? $col : "$col $this->order_direction";
-					}
-					$clauses[] = 'ORDER BY '.implode(', ', $order_fragments);
+					$clauses[] = $this->build_sort_clause($this->order, $this->order_direction);
 				}
 				
 				# select limit
@@ -1847,6 +1843,15 @@ class DatabaseQuery implements DatabaseQueryInterface {
 		$this->query = implode("\n", $clauses);
 		return $this->query;
 	}
+
+
+	private function build_sort_clause($order_by, $order_direction) {
+        $order_fragments = array();
+		foreach($this->escape_col_names($order_by) as $col) {
+			$order_fragments[] = (preg_match('/ (ASC|DESC|RAND\(\))$/i', $col))? $col : "$col $order_direction";
+		}
+		return 'ORDER BY '.implode(', ', $order_fragments);
+    }
 	
 	
 	/**
