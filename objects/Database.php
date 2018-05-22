@@ -392,11 +392,8 @@ class Database {
 	 *
 	 */
 	public static function error() {
-		
 		if(!self::$debug) exit();
-		
 		throw new DatabaseException(mysqli_connect_error(), mysqli_connect_errno());
-		
 	}
 	
 	
@@ -637,8 +634,6 @@ class Database {
 		
 }
 
-
-
 class DatabaseCache {
 
 	private static $cache = array();
@@ -716,37 +711,34 @@ class DatabaseCache {
 
 
 	public static function report() {
-?>
+		?>
 
-<div style="padding:20px;background:white;border:1px solid #ccc;margin:20px;">
-	<h3 style="border-bottom:2px solid #333;">DatabaseCache report</h3>
-	<table>
-		<tr>
-			<th>Resets</th>
-			<td><?=number_format(self::$resets, 0);?></td>
-		</tr>
-		<tr>
-			<th>Discards</th>
-			<td><?=implode(', ', self::$inserts_lost);?></td>
-		</tr>
-		<tr>
-			<th>Inserts</th>
-			<td><?=number_format(self::$inserts, 0);?></td>
-		</tr>
-		<tr>
-			<th>Hits</th>
-			<td><?=number_format(self::$hits, 0);?></td>
-		</tr>
-	</table>
-</div>
-<?php
+		<div style="padding:20px;background:white;border:1px solid #ccc;margin:20px;">
+			<h3 style="border-bottom:2px solid #333;">DatabaseCache report</h3>
+			<table>
+				<tr>
+					<th>Resets</th>
+					<td><?=number_format(self::$resets, 0);?></td>
+				</tr>
+				<tr>
+					<th>Discards</th>
+					<td><?=implode(', ', self::$inserts_lost);?></td>
+				</tr>
+				<tr>
+					<th>Inserts</th>
+					<td><?=number_format(self::$inserts, 0);?></td>
+				</tr>
+				<tr>
+					<th>Hits</th>
+					<td><?=number_format(self::$hits, 0);?></td>
+				</tr>
+			</table>
+		</div>
+		<?php
 	}
 
 
 }
-
-
-
 
 abstract class DatabaseQueryHelper {
 	
@@ -1162,9 +1154,6 @@ abstract class DatabaseQueryHelper {
 	
 	
 }
-
-
-
 
 class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnectionInterface {
 
@@ -1681,9 +1670,6 @@ Recent Queries:
 	
 }
 
-
-
-
 class DatabaseQuery implements DatabaseQueryInterface {
 	
 	public $table;
@@ -1856,8 +1842,6 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				}
 				
 				break;
-				
-				
 		}
 		
 		$this->query = implode("\n", $clauses);
@@ -2420,8 +2404,6 @@ class DatabaseQuery implements DatabaseQueryInterface {
 	
 	
 }
-
-
 	
 class DatabaseResult implements DatabaseResultInterface {
 	
@@ -2987,9 +2969,6 @@ class DatabaseResult implements DatabaseResultInterface {
 }
 
 
-
-
-
 interface DatabaseConnectionInterface{
 	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE);
 	public function __destruct();
@@ -3001,7 +2980,6 @@ interface DatabaseConnectionInterface{
 	public function error_msg();
 	public function handle_error($exit = TRUE);
 }
-
 
 interface DatabaseQueryInterface{
 	public function __construct(DatabaseConnection $connection, $table = NULL, $statement = NULL);
@@ -3021,7 +2999,6 @@ interface DatabaseQueryInterface{
 	public function run();
 }
 
-
 interface DatabaseResultInterface{
 	public function __construct(DatabaseConnection $connection, $qh, $sql = NULL, $time = NULL);
 	public function result();
@@ -3036,7 +3013,6 @@ interface DatabaseResultInterface{
 	public function null_set();
 	public function insert_id();
 }
-
 
 
 /**
