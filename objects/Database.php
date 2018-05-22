@@ -1164,7 +1164,8 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	public $database;
 	public $debug;
     public $persist;
-    public $allow_html = FALSE;
+	public $allow_html = FALSE;
+	public $charset;
     
 	public $query_history = array();
 	public $report_errors = TRUE;
@@ -1194,7 +1195,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 * @param integer $escape
 	 * @return resource MySQL connection resource
 	 */
-	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE, $escape = NULL, $auto_connect = FALSE) {
+	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE, $escape = NULL, $auto_connect = FALSE, $charset = '') {
 	
 		if(is_array($host)) extract($host);
 		
@@ -1203,7 +1204,8 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		$this->host 		= $host;
 		$this->database 	= $db;
 		$this->debug        = $debug;
-        $this->persist      = $persist;
+		$this->persist      = $persist;
+		$this->charset      = $charset;
 		
         $this->escape_options = (is_null($escape))?
         	DatabaseConnection::ESCAPE_STRIP_HTML | DatabaseConnection::ESCAPE_QUOTE :
@@ -1262,8 +1264,14 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		}
 
 		# Select the correct database if one was specified.
-		if($this->database != "") {
+		if(!empty($this->database)) {
 			@mysqli_select_db($this->connection, $this->database)
+				or $this->handle_connection_error($dieOnError && DatabaseConnection::$terminate_on_connect_fail);
+		}
+
+		# Set the character set for the connection
+		if(!empty($this->charset)) {
+			@mysqli_set_charset($this->connection, $this->charset)
 				or $this->handle_connection_error($dieOnError && DatabaseConnection::$terminate_on_connect_fail);
 		}
 
