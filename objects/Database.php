@@ -1411,15 +1411,15 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		
 			$options = (is_null($options))? $this->get_escape_options() : $options;
 	
-			if(($options & DatabaseConnection::ESCAPE_STRIP_HTML) != 0 && isset($this->strip_tag) && $this->strip_tags == TRUE) {
+			if(($options & DatabaseConnection::ESCAPE_STRIP_HTML) && isset($this->strip_tag) && $this->strip_tags == TRUE) {
 				$value = strip_tags($value);
 			}
 	
-			if(($options & DatabaseConnection::ESCAPE_FORCE) != 0 || !get_magic_quotes_gpc() || php_sapi_name() == 'cli') {
+			if(($options & DatabaseConnection::ESCAPE_FORCE) || !get_magic_quotes_gpc() || php_sapi_name() == 'cli') {
 				$value = mysqli_real_escape_string($this->connection(), $value);
 			}
 	
-			if(($options & DatabaseConnection::ESCAPE_QUOTE) != 0 && !is_integer($value)) {
+			if(($options & DatabaseConnection::ESCAPE_QUOTE) && !is_integer($value)) {
 				$value = "'$value'";
 			}
 	
