@@ -1444,7 +1444,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 */
 	public function execute($sql, $cache = FALSE) {
 	
-		if($this->connection === FALSE || !is_resource($this->connection)) {
+		if($this->connection === FALSE || !is_object($this->connection)) {
 			try {
 				$this->connect();
 			} catch(DatabaseException $e) {
@@ -1460,7 +1460,8 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		}
 
 		# Benchmark the query
-		$trace = array_shift($this->trace_error());
+		$trace = $this->trace_error();
+		$trace = array_shift($trace);
 		Benchmark::mark('', $sql, array(
 			'file' => $trace['file'].':'.$trace['line'],
 			'function' => $trace['class'].$trace['type'].$trace['function'].'()',
@@ -2161,7 +2162,8 @@ class DatabaseQuery implements DatabaseQueryInterface {
 			
 			if(!preg_match('/[\(\)<=>!]+/', $field) && stripos($field, ' IS ') === FALSE) {
 				$operator = (is_null($value))? 'IS' : '=';
-				$field = array_pop($this->escape_col_names($field))." ".$operator;
+				$escaped_columns = $this->escape_col_names($field);
+				$field = array_pop($escaped_columns)." ".$operator;
 			}
 			
 			if(is_null($value) && stripos($field, ' IS ') !== FALSE) {
