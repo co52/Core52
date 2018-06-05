@@ -375,6 +375,19 @@ class Database {
 	public function timestampToMySQL($timestamp) {
 		return date('Y-m-d H:i:s', $timestamp);
 	}
+
+	/**
+	 * Returns the last ID in a particular table, with options.
+	 *
+	 * @param string $table
+	 * @param string $id = 'id'
+	 * @param mixed $start = false
+	 * @param mixed $end = false
+	 * @return mixed
+	 */
+	public static function lastId($table, $id = 'id', $start = false, $end = false) {
+		return self::c()->lastId($table, $id, $start, $end);
+	}
 	
 	public static function error_reporting($state = NULL) {
 		if($state === FALSE || $state === TRUE) {
@@ -1151,7 +1164,28 @@ abstract class DatabaseQueryHelper {
 	}
 	
 	
-	
+	/**
+	 * Returns the last ID in a particular table, with options.
+	 *
+	 * @param string $table
+	 * @param string $id = 'id'
+	 * @param mixed $start = false
+	 * @param mixed $end = false
+	 * @return mixed
+	 */
+	public function lastId($table, $id = 'id', $start = false, $end = false) {
+		$this->query_instance()->select("MAX($id) AS id");
+
+		if ($start) {
+			$this->where("$id >", $start);
+			if ($end) {
+				$this->where("$id <", $end);
+			}
+		}
+
+		$result = $this->find($table);
+		return $result->null_set() ? $start : $result->row()->id;
+	}
 	
 }
 
