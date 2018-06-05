@@ -375,6 +375,19 @@ class Database {
 	public function timestampToMySQL($timestamp) {
 		return date('Y-m-d H:i:s', $timestamp);
 	}
+
+	/**
+	 * Returns the last ID in a particular table, with options.
+	 *
+	 * @param string $table
+	 * @param string $id = 'id'
+	 * @param mixed $start = false
+	 * @param mixed $end = false
+	 * @return mixed
+	 */
+	public static function lastId($table, $id = 'id', $start = false, $end = false) {
+		return self::c()->lastId($table, $id, $start, $end);
+	}
 	
 	public static function error_reporting($state = NULL) {
 		if($state === FALSE || $state === TRUE) {
@@ -392,11 +405,8 @@ class Database {
 	 *
 	 */
 	public static function error() {
-		
 		if(!self::$debug) exit();
-		
 		throw new DatabaseException(mysqli_connect_error(), mysqli_connect_errno());
-		
 	}
 	
 	
@@ -637,8 +647,6 @@ class Database {
 		
 }
 
-
-
 class DatabaseCache {
 
 	private static $cache = array();
@@ -716,37 +724,34 @@ class DatabaseCache {
 
 
 	public static function report() {
-?>
+		?>
 
-<div style="padding:20px;background:white;border:1px solid #ccc;margin:20px;">
-	<h3 style="border-bottom:2px solid #333;">DatabaseCache report</h3>
-	<table>
-		<tr>
-			<th>Resets</th>
-			<td><?=number_format(self::$resets, 0);?></td>
-		</tr>
-		<tr>
-			<th>Discards</th>
-			<td><?=implode(', ', self::$inserts_lost);?></td>
-		</tr>
-		<tr>
-			<th>Inserts</th>
-			<td><?=number_format(self::$inserts, 0);?></td>
-		</tr>
-		<tr>
-			<th>Hits</th>
-			<td><?=number_format(self::$hits, 0);?></td>
-		</tr>
-	</table>
-</div>
-<?php
+		<div style="padding:20px;background:white;border:1px solid #ccc;margin:20px;">
+			<h3 style="border-bottom:2px solid #333;">DatabaseCache report</h3>
+			<table>
+				<tr>
+					<th>Resets</th>
+					<td><?=number_format(self::$resets, 0);?></td>
+				</tr>
+				<tr>
+					<th>Discards</th>
+					<td><?=implode(', ', self::$inserts_lost);?></td>
+				</tr>
+				<tr>
+					<th>Inserts</th>
+					<td><?=number_format(self::$inserts, 0);?></td>
+				</tr>
+				<tr>
+					<th>Hits</th>
+					<td><?=number_format(self::$hits, 0);?></td>
+				</tr>
+			</table>
+		</div>
+		<?php
 	}
 
 
 }
-
-
-
 
 abstract class DatabaseQueryHelper {
 	
@@ -1159,12 +1164,30 @@ abstract class DatabaseQueryHelper {
 	}
 	
 	
-	
+	/**
+	 * Returns the last ID in a particular table, with options.
+	 *
+	 * @param string $table
+	 * @param string $id = 'id'
+	 * @param mixed $start = false
+	 * @param mixed $end = false
+	 * @return mixed
+	 */
+	public function lastId($table, $id = 'id', $start = false, $end = false) {
+		$this->query_instance()->select("MAX($id) AS id");
+
+		if ($start) {
+			$this->where("$id >", $start);
+			if ($end) {
+				$this->where("$id <", $end);
+			}
+		}
+
+		$result = $this->find($table);
+		return $result->null_set() ? $start : $result->row()->id;
+	}
 	
 }
-
-
-
 
 class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnectionInterface {
 
@@ -1175,7 +1198,8 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	public $database;
 	public $debug;
     public $persist;
-    public $allow_html = FALSE;
+	public $allow_html = FALSE;
+	public $charset;
     
 	public $query_history = array();
 	public $report_errors = TRUE;
@@ -1205,7 +1229,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 * @param integer $escape
 	 * @return resource MySQL connection resource
 	 */
-	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE, $escape = NULL, $auto_connect = FALSE) {
+	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE, $escape = NULL, $auto_connect = FALSE, $charset = '') {
 	
 		if(is_array($host)) extract($host);
 		
@@ -1214,7 +1238,8 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		$this->host 		= $host;
 		$this->database 	= $db;
 		$this->debug        = $debug;
-        $this->persist      = $persist;
+		$this->persist      = $persist;
+		$this->charset      = $charset;
 		
         $this->escape_options = (is_null($escape))?
         	DatabaseConnection::ESCAPE_STRIP_HTML | DatabaseConnection::ESCAPE_QUOTE :
@@ -1273,8 +1298,14 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		}
 
 		# Select the correct database if one was specified.
-		if($this->database != "") {
+		if(!empty($this->database)) {
 			@mysqli_select_db($this->connection, $this->database)
+				or $this->handle_connection_error($dieOnError && DatabaseConnection::$terminate_on_connect_fail);
+		}
+
+		# Set the character set for the connection
+		if(!empty($this->charset)) {
+			@mysqli_set_charset($this->connection, $this->charset)
 				or $this->handle_connection_error($dieOnError && DatabaseConnection::$terminate_on_connect_fail);
 		}
 
@@ -1422,15 +1453,15 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		
 			$options = (is_null($options))? $this->get_escape_options() : $options;
 	
-			if(($options & DatabaseConnection::ESCAPE_STRIP_HTML) != 0 && isset($this->strip_tag) && $this->strip_tags == TRUE) {
+			if(($options & DatabaseConnection::ESCAPE_STRIP_HTML) && isset($this->strip_tag) && $this->strip_tags == TRUE) {
 				$value = strip_tags($value);
 			}
 	
-			if(($options & DatabaseConnection::ESCAPE_FORCE) != 0 || !get_magic_quotes_gpc() || php_sapi_name() == 'cli') {
+			if(($options & DatabaseConnection::ESCAPE_FORCE) || !get_magic_quotes_gpc() || php_sapi_name() == 'cli') {
 				$value = mysqli_real_escape_string($this->connection(), $value);
 			}
 	
-			if(($options & DatabaseConnection::ESCAPE_QUOTE) != 0 && !is_integer($value)) {
+			if(($options & DatabaseConnection::ESCAPE_QUOTE) && !is_integer($value)) {
 				$value = "'$value'";
 			}
 	
@@ -1447,7 +1478,7 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 	 */
 	public function execute($sql, $cache = FALSE) {
 	
-		if($this->connection === FALSE || !is_resource($this->connection)) {
+		if($this->connection === FALSE || !is_object($this->connection)) {
 			try {
 				$this->connect();
 			} catch(DatabaseException $e) {
@@ -1463,7 +1494,8 @@ class DatabaseConnection extends DatabaseQueryHelper implements DatabaseConnecti
 		}
 
 		# Benchmark the query
-		$trace = array_shift($this->trace_error());
+		$trace = $this->trace_error();
+		$trace = array_shift($trace);
 		Benchmark::mark('', $sql, array(
 			'file' => $trace['file'].':'.$trace['line'],
 			'function' => $trace['class'].$trace['type'].$trace['function'].'()',
@@ -1681,9 +1713,6 @@ Recent Queries:
 	
 }
 
-
-
-
 class DatabaseQuery implements DatabaseQueryInterface {
 	
 	public $table;
@@ -1759,11 +1788,11 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				if(count($this->where) > 0) {
 					$clauses[] = 'WHERE '. implode(' AND ', $this->where);
 				}
-				
-				if(count($this->order) > 0) {
-					$clauses[] = 'ORDER BY '.implode(', ', $this->order);
-				}
-				
+
+                if(count($this->order) > 0) {
+                    $clauses[] = $this->build_sort_clause($this->order, $this->order_direction);
+                }
+
 				if(strlen($this->limit) > 0) {
 					$clauses[] = 'LIMIT '.$this->limit;
 				}
@@ -1780,11 +1809,11 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				if(count($this->where) > 0) {
 					$clauses[] = 'WHERE '. implode(' AND ', $this->where);
 				}
-				
-				if(count($this->order) > 0) {
-					$clauses[] = 'ORDER BY '.implode(', ', $this->order);
-				}
-				
+
+                if(count($this->order) > 0) {
+                    $clauses[] = $this->build_sort_clause($this->order, $this->order_direction);
+                }
+
 				if(strlen($this->limit) > 0) {
 					$clauses[] = 'LIMIT '.$this->limit;
 				}
@@ -1843,11 +1872,7 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				
 				# select order
 				if(count($this->order) > 0) {
-					$order_fragments = array();
-					foreach($this->escape_col_names($this->order) as $col) {
-						$order_fragments[] = (preg_match('/ (ASC|DESC|RAND\(\))$/i', $col))? $col : "$col $this->order_direction";
-					}
-					$clauses[] = 'ORDER BY '.implode(', ', $order_fragments);
+					$clauses[] = $this->build_sort_clause($this->order, $this->order_direction);
 				}
 				
 				# select limit
@@ -1856,13 +1881,20 @@ class DatabaseQuery implements DatabaseQueryInterface {
 				}
 				
 				break;
-				
-				
 		}
 		
 		$this->query = implode("\n", $clauses);
 		return $this->query;
 	}
+
+
+	private function build_sort_clause($order_by, $order_direction) {
+        $order_fragments = array();
+		foreach($this->escape_col_names($order_by) as $col) {
+			$order_fragments[] = (preg_match('/ (ASC|DESC|RAND\(\))$/i', $col))? $col : "$col $order_direction";
+		}
+		return 'ORDER BY '.implode(', ', $order_fragments);
+    }
 	
 	
 	/**
@@ -2164,7 +2196,8 @@ class DatabaseQuery implements DatabaseQueryInterface {
 			
 			if(!preg_match('/[\(\)<=>!]+/', $field) && stripos($field, ' IS ') === FALSE) {
 				$operator = (is_null($value))? 'IS' : '=';
-				$field = array_pop($this->escape_col_names($field))." ".$operator;
+				$escaped_columns = $this->escape_col_names($field);
+				$field = array_pop($escaped_columns)." ".$operator;
 			}
 			
 			if(is_null($value) && stripos($field, ' IS ') !== FALSE) {
@@ -2355,7 +2388,7 @@ class DatabaseQuery implements DatabaseQueryInterface {
 	 */
 	public function limit($limit, $offset = NULL) {
 
-		$this->limit = ($offset === NULL)? $limit : "$limit, $offset";
+		$this->limit = ($offset === NULL)? $limit : "$offset, $limit";
 		return $this;
 	}
 	
@@ -2420,8 +2453,6 @@ class DatabaseQuery implements DatabaseQueryInterface {
 	
 	
 }
-
-
 	
 class DatabaseResult implements DatabaseResultInterface {
 	
@@ -2987,9 +3018,6 @@ class DatabaseResult implements DatabaseResultInterface {
 }
 
 
-
-
-
 interface DatabaseConnectionInterface{
 	public function __construct($host = '', $user = '', $pass = '', $db = '', $debug = TRUE, $persist = TRUE);
 	public function __destruct();
@@ -3001,7 +3029,6 @@ interface DatabaseConnectionInterface{
 	public function error_msg();
 	public function handle_error($exit = TRUE);
 }
-
 
 interface DatabaseQueryInterface{
 	public function __construct(DatabaseConnection $connection, $table = NULL, $statement = NULL);
@@ -3021,7 +3048,6 @@ interface DatabaseQueryInterface{
 	public function run();
 }
 
-
 interface DatabaseResultInterface{
 	public function __construct(DatabaseConnection $connection, $qh, $sql = NULL, $time = NULL);
 	public function result();
@@ -3036,7 +3062,6 @@ interface DatabaseResultInterface{
 	public function null_set();
 	public function insert_id();
 }
-
 
 
 /**
