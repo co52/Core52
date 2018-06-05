@@ -33,7 +33,7 @@ class Ical  {
 			$this->add_event($data['uid'], $data['start'], $data['end'], $data['summary'], $data['description'], $data['tz']);
 		}
 
-		if(count($data)) return $this->build($mode, $filename);
+		if(count($this->events)) return $this->build($mode, $filename);
 	}
 
 	function __destruct() {
@@ -227,4 +227,3 @@ class Ical  {
 
 
 }
-
