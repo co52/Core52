@@ -107,7 +107,7 @@ class Database_Migrator {
      * @var array
      *
      */
-    protected $_list;
+    protected $_list = array();
     
     /**
      *

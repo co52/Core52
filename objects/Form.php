@@ -779,7 +779,7 @@ class Form {
 		foreach($rules as $rule)
 		{
 			// don't run any more rules if we failed the last one
-			if(count($this->errors[$field])) break;
+			if(!empty($this->errors[$field])) break;
 			
 			// parse parameter from rule (format: "rule[parameterlist]")
 			$full_rule = $rule;
@@ -1105,7 +1105,7 @@ class Form {
 			$this->set_error($field, $full_rule);
 		}
 		
-		return (strlen($this->errors[$field]) == 0);
+		return (empty($this->errors[$field]));
 	}
 	
 	
@@ -1267,7 +1267,7 @@ class Form {
 		unset($attributes['default']);
 									
 		# add error class if needed
-		if($this->errors[$field]) {
+		if(!empty($this->errors[$field])) {
 			$classes = explode(' ', $attributes['class']);
 			$classes[] = 'error';
 			$attributes['class'] = implode(' ', $classes);
@@ -1349,7 +1349,7 @@ class Form {
 				break;
 		}
 		
-		if($include_error && $this->errors[$field]) {
+		if($include_error && !empty($this->errors[$field])) {
 			$theField .= $this->errors[$field];
 		}
 		
@@ -1533,5 +1533,4 @@ if (! function_exists('days_in_month'))
 		return $days_in_month[$month - 1];
 	}
 }
-
 
