@@ -768,7 +768,7 @@ DEBUG;
 				'/',                   // cookie path
 				$this->domain,         // cookie domain
 				(Router::protocol() == 'https' && $this->secure_cookies), // transmit only over https
-				(Router::protocol() == 'http' && $this->secure_cookies)   // set the HTTPONLY flag if supported
+				$this->secure_cookies   // HttpOnly flag
 			);
 
 			// start the session
